@@ -1,0 +1,126 @@
+import React from 'react';
+import { useDemo } from '../../context/DemoContext';
+import { FairWageCard } from '../common/FairWageCard';
+import { ShieldCheck, TrendingUp, Heart, Landmark, CheckCircle2, ArrowUpRight, DollarSign } from 'lucide-react';
+
+export const WorkerEarnings: React.FC = () => {
+  const { wageConfig } = useDemo();
+
+  return (
+    <div className="space-y-6">
+      
+      {/* Top Metrics Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Today's Payout</span>
+          <span className="text-2xl font-extrabold text-emerald-700 mt-1 block">₹1,250</span>
+          <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
+            <ArrowUpRight className="w-3 h-3" /> 3 Jobs Completed Today
+          </span>
+        </div>
+
+        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">This Week</span>
+          <span className="text-2xl font-extrabold text-slate-900 mt-1 block">₹7,840</span>
+          <span className="text-[10px] text-slate-500 font-semibold mt-1 block">18 Jobs Completed</span>
+        </div>
+
+        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">This Month</span>
+          <span className="text-2xl font-extrabold text-slate-900 mt-1 block">₹28,450</span>
+          <span className="text-[10px] text-slate-500 font-semibold mt-1 block">86 Total Jobs</span>
+        </div>
+
+        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Welfare Balance</span>
+          <span className="text-2xl font-extrabold text-amber-600 mt-1 block">₹18,450</span>
+          <span className="text-[10px] text-amber-700 font-semibold mt-1 block">Active Pension & Health</span>
+        </div>
+      </div>
+
+      {/* Hero Fair Wage Protection Banner */}
+      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 text-white p-6 rounded-3xl shadow-xl border border-emerald-500/40 relative overflow-hidden">
+        <div className="max-w-2xl relative z-10 space-y-3">
+          <div className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <span>Cooperative Fair Wage Guarantee</span>
+          </div>
+
+          <h3 className="text-2xl font-extrabold text-white">
+            100% Transparent Worker Earnings Policy
+          </h3>
+
+          <p className="text-xs text-slate-300 leading-relaxed font-medium">
+            Unlike private aggregator apps that take 25%–35% hidden commissions, your cooperative guarantees that 
+            <strong className="text-emerald-400 font-bold"> {wageConfig.workerPct}% of every customer payment</strong> goes directly to your bank account, with 
+            <strong className="text-amber-400 font-bold"> {wageConfig.welfarePct}% added to your personal welfare & health fund</strong>.
+          </p>
+
+          <div className="pt-2 flex flex-wrap gap-4 text-xs font-semibold text-emerald-300">
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Zero Corporate Deductions
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Instant Same-Day Payout
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Federation Backed
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Per-Job Fair Wage Split Example */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 className="font-extrabold text-sm text-slate-900 mb-3">
+            Sample Job Payout Breakdown (₹500 Service)
+          </h4>
+          <FairWageCard amount={500} title="Your Per-Job Payout Split" />
+        </div>
+
+        <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-4">
+          <h4 className="font-extrabold text-sm text-slate-900">
+            Recent Job Settlements
+          </h4>
+          
+          <div className="divide-y divide-slate-100 text-xs">
+            <div className="py-3 flex justify-between items-center">
+              <div>
+                <span className="font-bold text-slate-900 block">Switchboard Repair (BK-2026-9041)</span>
+                <span className="text-slate-500">Customer Paid ₹500 • Today 05:00 PM</span>
+              </div>
+              <div className="text-right">
+                <span className="font-extrabold text-emerald-700 text-sm block">+₹425 Direct</span>
+                <span className="text-[10px] text-amber-600 font-bold">+₹25 Welfare</span>
+              </div>
+            </div>
+
+            <div className="py-3 flex justify-between items-center">
+              <div>
+                <span className="font-bold text-slate-900 block">Geyser Connection Fix</span>
+                <span className="text-slate-500">Customer Paid ₹400 • Yesterday</span>
+              </div>
+              <div className="text-right">
+                <span className="font-extrabold text-emerald-700 text-sm block">+₹340 Direct</span>
+                <span className="text-[10px] text-amber-600 font-bold">+₹20 Welfare</span>
+              </div>
+            </div>
+
+            <div className="py-3 flex justify-between items-center">
+              <div>
+                <span className="font-bold text-slate-900 block">Fan Installation & Wiring</span>
+                <span className="text-slate-500">Customer Paid ₹350 • Sep 04</span>
+              </div>
+              <div className="text-right">
+                <span className="font-extrabold text-emerald-700 text-sm block">+₹297 Direct</span>
+                <span className="text-[10px] text-amber-600 font-bold">+₹18 Welfare</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  );
+};
