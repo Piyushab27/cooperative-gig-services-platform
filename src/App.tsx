@@ -8,6 +8,7 @@ import { CustomerView } from './components/customer/CustomerView';
 import { WorkerDashboard } from './components/worker/WorkerDashboard';
 import { CoopAdminDashboard } from './components/admin/CoopAdminDashboard';
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { SuperAdminDashboard } from './components/admin/SuperAdminDashboard';
 import { Handshake, Heart, ShieldCheck, Sparkles } from 'lucide-react';
 
 const MainApp: React.FC = () => {
@@ -41,6 +42,7 @@ const MainApp: React.FC = () => {
         {demoRole === 'worker' && <WorkerDashboard />}
         {demoRole === 'cooperative_admin' && <CoopAdminDashboard />}
         {demoRole === 'federation_admin' && <AdminDashboard />}
+        {demoRole === 'super_admin' && <SuperAdminDashboard />}
       </main>
 
       {/* Footer */}
