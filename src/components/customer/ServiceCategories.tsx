@@ -38,7 +38,34 @@ const CATEGORIES: CategoryDef[] = [
 ];
 
 export const ServiceCategories: React.FC = () => {
-  const { selectedCategory, setSelectedCategory } = useDemo();
+  const { 
+    selectedCategory, setSelectedCategory,
+    selectedCategories, setSelectedCategories,
+    isMultiSelectMode, setIsMultiSelectMode
+  } = useDemo();
+
+  const handleToggleMode = () => {
+    setIsMultiSelectMode(!isMultiSelectMode);
+    // Reset selection when switching modes
+    setSelectedCategory(null);
+    setSelectedCategories([]);
+  };
+
+  const handleCategoryClick = (catId: ServiceCategory) => {
+    if (isMultiSelectMode) {
+      if (selectedCategories.includes(catId)) {
+        setSelectedCategories(selectedCategories.filter(id => id !== catId));
+      } else {
+        setSelectedCategories([...selectedCategories, catId]);
+      }
+    } else {
+      setSelectedCategory(selectedCategory === catId ? null : catId);
+    }
+  };
+
+  const handleClearAll = () => {
+    setSelectedCategories([]);
+  };
 
   return (
     <section className="pb-6">
@@ -49,24 +76,53 @@ export const ServiceCategories: React.FC = () => {
             <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider bg-emerald-100 px-3 py-1 rounded-full">
               Explore Services
             </span>
-            <h2 className="text-2xl font-extrabold text-slate-900 mt-2">
+            <h2 className="text-2xl font-extrabold text-slate-900 mt-2 flex items-center gap-4">
               Cooperative Skilled Trades
             </h2>
             <p className="text-slate-500 text-xs sm:text-sm mt-1">
               Select a service category to view available workers
             </p>
           </div>
+          
+          {/* Multiselect controls */}
+          <div className="flex flex-col items-end gap-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input 
+                type="checkbox" 
+                checked={isMultiSelectMode} 
+                onChange={handleToggleMode}
+                className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
+              />
+              <span className="text-sm font-bold text-slate-700">Multi-select services</span>
+            </label>
+            
+            {isMultiSelectMode && selectedCategories.length > 0 && (
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">
+                  {selectedCategories.length} selected
+                </span>
+                <button 
+                  onClick={handleClearAll}
+                  className="text-xs font-bold text-red-500 hover:text-red-700 hover:underline"
+                >
+                  Clear All
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
           {CATEGORIES.map(cat => {
             const IconComponent = cat.icon;
-            const isSelected = selectedCategory === cat.id;
+            const isSelected = isMultiSelectMode 
+              ? selectedCategories.includes(cat.id)
+              : selectedCategory === cat.id;
 
             return (
               <button
                 key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
+                onClick={() => handleCategoryClick(cat.id)}
                 className={`p-4 rounded-2xl text-left transition-all duration-200 relative group flex flex-col justify-between border ${
                   isSelected
                     ? 'bg-emerald-50 border-emerald-500 shadow-md ring-2 ring-emerald-500/30 transform -translate-y-1'

@@ -26,7 +26,8 @@ export const Navbar: React.FC = () => {
     setLocation,
     notifications,
     markNotificationRead,
-    triggerDemoJourney
+    triggerDemoJourney,
+    setEmergencyModalOpen
   } = useDemo();
   
   const { user, logout, setShowLogin } = useAuth();
@@ -112,6 +113,17 @@ export const Navbar: React.FC = () => {
           {/* Right Actions: Language + Notifications + Avatar */}
           <div className="flex items-center gap-2">
             
+            {/* 1-Tap Emergency Button (Customer Only) */}
+            {role === 'customer' && (
+              <button
+                onClick={() => setEmergencyModalOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-extrabold transition-all shadow-sm mr-2"
+              >
+                <span className="text-sm">🚨</span>
+                <span className="hidden sm:inline">1-Tap Emergency</span>
+              </button>
+            )}
+
             {/* 5 Roles Selector */}
             <div className="flex flex-wrap items-center gap-1 sm:gap-2 mr-2">
               {(['customer', 'worker', 'cooperative_admin', 'federation_admin', 'super_admin'] as Role[]).map((r) => (

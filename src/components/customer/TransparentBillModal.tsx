@@ -27,6 +27,59 @@ export const TransparentBillModal: React.FC<TransparentBillModalProps> = ({
   const travelCost = 50;
   const totalAmount = booking.finalPrice || baseFare + materialsCost + travelCost;
 
+  const handleDownload = () => {
+    const workerEarnings = Math.round(totalAmount * 0.85);
+    const coOpContribution = Math.round(totalAmount * 0.10);
+    const welfareFund = Math.round(totalAmount * 0.05);
+
+    const invoiceContent = `SAHAKAAR
+Cooperative Service Marketplace
+
+COOPERATIVE VERIFIED INVOICE
+================================
+
+Customer: Priya Sharma
+Worker: ${booking.workerName}
+Service: ${booking.serviceTitle}
+Verification: Verified Cooperative Member
+
+--------------------------------
+ITEMIZED LINE ITEMS
+--------------------------------
+Cooperative Worker Service Fare: ₹${baseFare}
+Materials & Spares: ₹${materialsCost}
+Travel & Local Transport: ₹${travelCost}
+
+--------------------------------
+TOTAL INVOICE AMOUNT: ₹${totalAmount}
+--------------------------------
+
+PAYMENT DISTRIBUTION
+--------------------------------
+Worker Direct Earnings (85%): ₹${workerEarnings}
+Cooperative Contribution (10%): ₹${coOpContribution}
+Worker Welfare & Insurance Fund (5%): ₹${welfareFund}
+
+--------------------------------
+✓ Fair wage protected
+✓ Zero corporate commission
+✓ Cooperative owned
+✓ Worker welfare enabled
+`;
+
+    const blob = new Blob([invoiceContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Sahakaar-Invoice-${booking.id}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert('Invoice downloaded successfully.');
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in">
       <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl relative border border-slate-100 overflow-hidden text-slate-900">
@@ -111,13 +164,26 @@ export const TransparentBillModal: React.FC<TransparentBillModalProps> = ({
             <span className="text-xl font-extrabold text-slate-900">₹{totalAmount}</span>
           </div>
 
-          <button
-            onClick={() => onProceedToPayment(totalAmount)}
-            className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm transition shadow-xl shadow-emerald-600/30 flex items-center gap-2"
-          >
-            <span>PROCEED TO DIGITAL PAYMENT</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex gap-2">
+            {booking.status === 'completed' && (
+              <button
+                onClick={handleDownload}
+                className="px-4 py-3 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-extrabold text-sm transition shadow-sm flex items-center gap-2"
+              >
+                <span>↓ Download Invoice</span>
+              </button>
+            )}
+            
+            {booking.status !== 'completed' && (
+              <button
+                onClick={() => onProceedToPayment(totalAmount)}
+                className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm transition shadow-xl shadow-emerald-600/30 flex items-center gap-2"
+              >
+                <span>PROCEED TO DIGITAL PAYMENT</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
       </div>

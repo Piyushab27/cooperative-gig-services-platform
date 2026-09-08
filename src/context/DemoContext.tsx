@@ -39,14 +39,20 @@ interface DemoContextType {
   setActiveBookingId: (id: string | null) => void;
   activeWorkerId: string;
   setActiveWorkerId: (id: string) => void;
-  selectedCategory: ServiceCategory;
-  setSelectedCategory: (cat: ServiceCategory) => void;
+  selectedCategory: ServiceCategory | null;
+  setSelectedCategory: (cat: ServiceCategory | null) => void;
+  selectedCategories: ServiceCategory[];
+  setSelectedCategories: (cats: ServiceCategory[]) => void;
+  isMultiSelectMode: boolean;
+  setIsMultiSelectMode: (mode: boolean) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   filterOptions: FilterOptions;
   setFilterOptions: (options: FilterOptions) => void;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
+  isEmergencyModalOpen: boolean;
+  setEmergencyModalOpen: (open: boolean) => void;
   notifications: NotificationItem[];
   markNotificationRead: (id: string) => void;
   messages: Record<string, ChatMessage[]>;
@@ -144,13 +150,16 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [bookings, setBookings] = useState<Booking[]>(INITIAL_BOOKINGS);
   const [activeBookingId, setActiveBookingId] = useState<string | null>('BK-2026-9041');
   const [activeWorkerId, setActiveWorkerId] = useState<string>('w-1');
-  const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>('electrician');
+  const [selectedCategory, setSelectedCategory] = useState<ServiceCategory | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<ServiceCategory[]>([]);
+  const [isMultiSelectMode, setIsMultiSelectMode] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     maxDistance: 10,
     minRating: 0,
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isEmergencyModalOpen, setEmergencyModalOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Record<string, ChatMessage[]>>(INITIAL_MESSAGES);
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
   const [wageConfig, setWageConfig] = useState<WageConfig>({
@@ -359,12 +368,18 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setActiveWorkerId,
         selectedCategory,
         setSelectedCategory,
+        selectedCategories,
+        setSelectedCategories,
+        isMultiSelectMode,
+        setIsMultiSelectMode,
         searchQuery,
         setSearchQuery,
         filterOptions,
         setFilterOptions,
         isLoading,
         setIsLoading,
+        isEmergencyModalOpen,
+        setEmergencyModalOpen,
         notifications,
         markNotificationRead,
         messages,

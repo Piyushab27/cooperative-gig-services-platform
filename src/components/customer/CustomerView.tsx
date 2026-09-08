@@ -23,13 +23,16 @@ export const CustomerView: React.FC = () => {
     createBooking,
     activeBookingId,
     setActiveBookingId,
-    location
+    location,
+    isEmergencyModalOpen,
+    setEmergencyModalOpen,
+    isMultiSelectMode,
+    selectedCategories
   } = useDemo();
 
   const [activeCustomerSubTab, setActiveCustomerSubTab] = useState<'browse' | 'tracker' | 'dashboard'>('browse');
 
   // Modals state
-  const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
   const [selectedProfileWorker, setSelectedProfileWorker] = useState<Worker | null>(null);
   const [bookingWizardWorker, setBookingWizardWorker] = useState<Worker | null>(null);
   const [isBookingWizardOpen, setIsBookingWizardOpen] = useState(false);
@@ -42,7 +45,16 @@ export const CustomerView: React.FC = () => {
   const finalWorkers = workers.filter(w => {
     if (w.distanceKm > filterOptions.maxDistance) return false;
     if (w.rating < filterOptions.minRating) return false;
-    if (w.category !== selectedCategory) return false;
+    
+    // Multi-select filtering
+    if (isMultiSelectMode) {
+      if (selectedCategories.length > 0 && !selectedCategories.includes(w.category)) {
+        return false;
+      }
+    } else {
+      // Single-select filtering
+      if (w.category !== selectedCategory) return false;
+    }
     // apply basic search filter if query exists
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -63,20 +75,21 @@ export const CustomerView: React.FC = () => {
     
     // Instead of AI Matching, directly confirm
     createBooking({
-      category: selectedCategory,
-      worker: details.worker,
-      scheduledDate: 'Today',
-      scheduledTime: '05:00 PM',
-      address: 'Flat 402, Green Valley Apartments, Banjara Hills',
-      problem: 'Service request',
+      category: bookingWizardWorker?.category || details.category || 'electrician',
+      worker: bookingWizardWorker || details.worker,
+      scheduledDate: details.scheduledDate || 'Today',
+      scheduledTime: details.scheduledTime || '05:00 PM',
+      address: details.address || 'Flat 402, Green Valley Apartments, Banjara Hills',
+      problem: details.problem || 'Service request',
     });
+    
     setActiveCustomerSubTab('tracker');
   };
 
   const handleConfirmEmergency = (worker: any) => {
-    setIsEmergencyOpen(false);
+    setEmergencyModalOpen(false);
     createBooking({
-      category: selectedCategory || 'electrical',
+      category: worker.category,
       worker,
       scheduledDate: 'Right Now (Emergency)',
       scheduledTime: 'Immediate',
@@ -128,21 +141,14 @@ export const CustomerView: React.FC = () => {
               Customer Profile & Bookings
             </button>
           </div>
-
-          <button
-            onClick={() => setIsEmergencyOpen(true)}
-            className="text-red-600 font-extrabold flex items-center gap-1 hover:underline text-[11px] whitespace-nowrap shrink-0 ml-4"
-          >
-            <span>🚨 1-Tap Emergency</span>
-          </button>
         </div>
       </div>
 
       {activeCustomerSubTab === 'browse' && (
         <div className="space-y-6">
           
-          {/* Landing Hero (Search + Emergency Dispatch) */}
-          <LandingHero onOpenEmergency={() => setIsEmergencyOpen(true)} />
+          {/* Landing Hero (Search) */}
+          <LandingHero />
 
           {/* Service Categories Grid */}
           <ServiceCategories />
@@ -150,9 +156,9 @@ export const CustomerView: React.FC = () => {
           {/* Worker Results Header */}
           <div className="w-[92%] max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
             
-            {!selectedCategory ? (
+            {!(isMultiSelectMode ? selectedCategories.length > 0 : !!selectedCategory) ? (
               <div className="text-center py-16 bg-white border border-slate-200 rounded-3xl shadow-sm">
-                <p className="text-slate-500 font-bold">Select a service to view available workers</p>
+                <p className="text-slate-500 font-bold">Select a service to view available cooperative workers.</p>
               </div>
             ) : (
               <>
@@ -161,7 +167,7 @@ export const CustomerView: React.FC = () => {
                 <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                   <div>
                     <h3 className="text-xl font-extrabold text-slate-900 uppercase">
-                      AVAILABLE {selectedCategory.replace('_', ' ')}S
+                      AVAILABLE {isMultiSelectMode ? 'WORKERS' : selectedCategory?.replace('_', ' ') + 'S'}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium mt-1">
                       Verified workers near {location}
@@ -218,8 +224,8 @@ export const CustomerView: React.FC = () => {
 
       {/* MODAL DIALOGS */}
       <EmergencyModal
-        isOpen={isEmergencyOpen}
-        onClose={() => setIsEmergencyOpen(false)}
+        isOpen={isEmergencyModalOpen}
+        onClose={() => setEmergencyModalOpen(false)}
         onConfirmEmergency={handleConfirmEmergency}
       />
 
