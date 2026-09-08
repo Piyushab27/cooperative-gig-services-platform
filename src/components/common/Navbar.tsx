@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   ChevronDown
 } from 'lucide-react';
+import { NotificationDrawer } from './NotificationDrawer';
 
 export const Navbar: React.FC = () => {
   const {
@@ -129,9 +130,9 @@ export const Navbar: React.FC = () => {
             </button>
 
             <button
-              onClick={() => setRole('admin')}
+              onClick={() => setRole('federation_admin')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                role === 'admin'
+                role === 'federation_admin'
                   ? 'bg-white text-emerald-700 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
@@ -191,10 +192,10 @@ export const Navbar: React.FC = () => {
               )}
             </div>
 
-            {/* Notifications Popover */}
+            {/* Notifications Toggle */}
             <div className="relative">
               <button
-                onClick={() => setShowNotifMenu(!showNotifMenu)}
+                onClick={() => setShowNotifMenu(true)}
                 className="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition"
               >
                 <Bell className="w-5 h-5" />
@@ -204,35 +205,12 @@ export const Navbar: React.FC = () => {
                   </span>
                 )}
               </button>
-
-              {showNotifMenu && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 py-3 z-50">
-                  <div className="px-4 pb-2 border-b border-slate-100 flex items-center justify-between">
-                    <h4 className="font-bold text-sm text-slate-800">Notifications</h4>
-                    <span className="text-[11px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
-                      {unreadCount} new
-                    </span>
-                  </div>
-                  <div className="max-h-72 overflow-y-auto divide-y divide-slate-100">
-                    {notifications.map(n => (
-                      <div
-                        key={n.id}
-                        onClick={() => markNotificationRead(n.id)}
-                        className={`p-3 text-xs hover:bg-slate-50 transition cursor-pointer ${
-                          !n.read ? 'bg-emerald-50/40' : ''
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-slate-900">{n.title}</span>
-                          <span className="text-[10px] text-slate-400">{n.timestamp}</span>
-                        </div>
-                        <p className="text-slate-600 text-[11px] leading-relaxed">{n.message}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
+            
+            <NotificationDrawer 
+              isOpen={showNotifMenu} 
+              onClose={() => setShowNotifMenu(false)} 
+            />
 
             {/* User Profile Avatar */}
             <div className="pl-2 border-l border-slate-200 flex items-center gap-2">

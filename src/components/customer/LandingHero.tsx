@@ -21,7 +21,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenEmergency }) => 
         <div className="flex justify-center mb-4">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 backdrop-blur-md text-xs font-semibold">
             <HeartHandshake className="w-4 h-4 text-emerald-400" />
-            <span>Cooperative-Owned • 100% Fair Wages • Verified Skilled Workers</span>
+            <span>{t('heroTagline')}</span>
           </div>
         </div>
 
@@ -60,7 +60,7 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenEmergency }) => 
             {/* AI Search CTA button */}
             <button className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 shrink-0">
               <Sparkles className="w-4 h-4" />
-              <span>AI Search</span>
+              <span>{t('aiSearchBtn')}</span>
             </button>
           </div>
         </div>
@@ -85,13 +85,13 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenEmergency }) => 
                   </span>
                 </div>
                 <p className="text-slate-200 text-xs font-medium mt-0.5">
-                  Electrical, Plumbing, or AC failure? Instant match nearest worker now.
+                  {t('emergencyDesc')}
                 </p>
               </div>
             </div>
 
             <button className="hidden sm:flex items-center gap-1 bg-red-600 hover:bg-red-500 text-white text-xs font-bold px-4 py-2 rounded-xl shadow transition shrink-0">
-              <span>DISPATCH NOW</span>
+              <span>{t('dispatchNow')}</span>
             </button>
           </div>
         </div>
@@ -100,19 +100,19 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenEmergency }) => 
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
           <div className="bg-slate-900/60 backdrop-blur-md p-4 rounded-2xl border border-slate-800 text-center">
             <div className="text-2xl font-extrabold text-emerald-400">2,846+</div>
-            <div className="text-xs text-slate-400 mt-0.5">Verified Workers</div>
+            <div className="text-xs text-slate-400 mt-0.5">{t('statVerifiedWorkers')}</div>
           </div>
           <div className="bg-slate-900/60 backdrop-blur-md p-4 rounded-2xl border border-slate-800 text-center">
             <div className="text-2xl font-extrabold text-emerald-400">12,480+</div>
-            <div className="text-xs text-slate-400 mt-0.5">Jobs Completed</div>
+            <div className="text-xs text-slate-400 mt-0.5">{t('statJobsCompleted')}</div>
           </div>
           <div className="bg-slate-900/60 backdrop-blur-md p-4 rounded-2xl border border-slate-800 text-center">
             <div className="text-2xl font-extrabold text-emerald-400">4.9 ★</div>
-            <div className="text-xs text-slate-400 mt-0.5">Avg Rating</div>
+            <div className="text-xs text-slate-400 mt-0.5">{t('statAvgRating')}</div>
           </div>
           <div className="bg-slate-900/60 backdrop-blur-md p-4 rounded-2xl border border-slate-800 text-center">
             <div className="text-2xl font-extrabold text-emerald-400">₹48.6L+</div>
-            <div className="text-xs text-slate-400 mt-0.5">Fair Worker Payouts</div>
+            <div className="text-xs text-slate-400 mt-0.5">{t('statFairPayouts')}</div>
           </div>
         </div>
 

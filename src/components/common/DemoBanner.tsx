@@ -27,7 +27,8 @@ export const DemoBanner: React.FC = () => {
             }`}
           >
             <User className="w-3.5 h-3.5" />
-            <span>Customer Demo</span>
+            <span className="hidden lg:inline">Customer Demo</span>
+            <span className="lg:hidden">Customer</span>
           </button>
 
           <button
@@ -39,19 +40,47 @@ export const DemoBanner: React.FC = () => {
             }`}
           >
             <HardHat className="w-3.5 h-3.5" />
-            <span>Worker Demo</span>
+            <span className="hidden lg:inline">Worker Demo</span>
+            <span className="lg:hidden">Worker</span>
           </button>
 
           <button
-            onClick={() => triggerDemoJourney('admin')}
+            onClick={() => triggerDemoJourney('cooperative_admin')}
             className={`px-3 py-1 rounded-lg text-xs flex items-center gap-1.5 transition-all ${
-              role === 'admin'
+              role === 'cooperative_admin'
                 ? 'bg-emerald-500 text-white font-bold shadow-md shadow-emerald-900/50 ring-1 ring-white/30'
                 : 'bg-slate-800/80 text-slate-200 hover:bg-slate-700 hover:text-white'
             }`}
           >
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Admin Demo</span>
+            <span className="hidden lg:inline">Co-op Admin</span>
+            <span className="lg:hidden">Co-op</span>
+          </button>
+
+          <button
+            onClick={() => triggerDemoJourney('federation_admin')}
+            className={`px-3 py-1 rounded-lg text-xs flex items-center gap-1.5 transition-all ${
+              role === 'federation_admin'
+                ? 'bg-emerald-500 text-white font-bold shadow-md shadow-emerald-900/50 ring-1 ring-white/30'
+                : 'bg-slate-800/80 text-slate-200 hover:bg-slate-700 hover:text-white'
+            }`}
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span className="hidden lg:inline">Fed Admin</span>
+            <span className="lg:hidden">Fed</span>
+          </button>
+
+          <button
+            onClick={() => triggerDemoJourney('super_admin')}
+            className={`px-3 py-1 rounded-lg text-xs flex items-center gap-1.5 transition-all ${
+              role === 'super_admin'
+                ? 'bg-emerald-500 text-white font-bold shadow-md shadow-emerald-900/50 ring-1 ring-white/30'
+                : 'bg-slate-800/80 text-slate-200 hover:bg-slate-700 hover:text-white'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span className="hidden lg:inline">Super Admin</span>
+            <span className="lg:hidden">Super</span>
           </button>
         </div>
       </div>

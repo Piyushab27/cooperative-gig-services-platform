@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { BookingStatus } from '../../types';
 import { VerifiedBadge } from '../common/VerifiedBadge';
+import { LoadingSpinner } from '../common/LoadingSpinner';
+import { EmptyState } from '../common/EmptyState';
 import {
   Calendar,
   Clock,
@@ -25,7 +27,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
   onTrackBooking,
   onViewBill,
 }) => {
-  const { bookings, location } = useDemo();
+  const { bookings, location, isLoading } = useDemo();
   const [activeTab, setActiveTab] = useState<'bookings' | 'addresses' | 'payments' | 'invoices'>('bookings');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('all');
 
@@ -38,6 +40,8 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       
+      {isLoading && <LoadingSpinner fullScreen message="Loading dashboard data..." />}
+
       {/* Profile Header Banner */}
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-6 rounded-3xl shadow-xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -118,6 +122,18 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
           <FileText className="w-4 h-4" />
           <span>Invoices</span>
         </button>
+
+        <button
+          onClick={() => setActiveTab('disputes' as any)}
+          className={`px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 ${
+            activeTab === 'disputes' as any
+              ? 'bg-rose-600 text-white shadow-md'
+              : 'bg-white text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <ShieldCheck className="w-4 h-4" />
+          <span>Support & Disputes</span>
+        </button>
       </div>
 
       {/* BOOKINGS TAB */}
@@ -155,9 +171,13 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
           </div>
 
           {filteredBookings.length === 0 ? (
-            <div className="bg-white p-8 rounded-3xl text-center text-slate-400 border border-slate-200">
-              No bookings found under this filter.
-            </div>
+            <EmptyState
+              icon={Calendar}
+              title="No Bookings Found"
+              description="You don't have any bookings matching this filter. Need a service?"
+              actionLabel="Find a Worker"
+              onAction={() => setActiveTab('bookings')} // Or redirect to home
+            />
           ) : (
             <div className="space-y-4">
               {filteredBookings.map(b => (
@@ -272,6 +292,37 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
             >
               Download PDF
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* DISPUTES TAB */}
+      {(activeTab as any) === 'disputes' && (
+        <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-extrabold text-base text-slate-900">Support & Disputes</h3>
+            <button className="px-4 py-2 bg-rose-50 text-rose-700 text-xs font-bold rounded-xl hover:bg-rose-100 transition">
+              Raise New Dispute
+            </button>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-sm text-slate-900">Overcharging Complaint (BK-2026-8812)</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 uppercase">
+                  Under Review
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 mb-3">
+                Worker asked for ₹200 extra beyond the agreed estimated price for materials not used.
+              </p>
+              <div className="flex items-center gap-2 text-[10px] font-semibold text-slate-500">
+                <span>Raised: 2 days ago</span>
+                <span>•</span>
+                <span>Assigned to: Hyderabad Federation Grievance Cell</span>
+              </div>
+            </div>
           </div>
         </div>
       )}

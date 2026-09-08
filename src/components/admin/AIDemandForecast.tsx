@@ -44,28 +44,38 @@ export const AIDemandForecast: React.FC = () => {
       {/* Key AI Insights Callouts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
         
-        <div className="p-4 rounded-2xl bg-sky-50/80 border border-sky-200 flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold shrink-0 shadow">
-            <Snowflake className="w-5 h-5" />
+        <div className="p-4 rounded-2xl bg-sky-50/80 border border-sky-200 flex flex-col justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold shrink-0 shadow">
+              <Snowflake className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="font-extrabold text-xs text-sky-900 block">AI Heatmap Insight #1</span>
+              <p className="text-xs text-slate-700 leading-relaxed font-medium mt-0.5">
+                "AC technician demand is predicted to increase by <strong className="text-sky-900 font-bold">32% tomorrow</strong> in Hyderabad due to expected 38°C temperature spike."
+              </p>
+            </div>
           </div>
-          <div>
-            <span className="font-extrabold text-xs text-sky-900 block">AI Heatmap Insight #1</span>
-            <p className="text-xs text-slate-700 leading-relaxed font-medium mt-0.5">
-              "AC technician demand is predicted to increase by <strong className="text-sky-900 font-bold">32% tomorrow</strong> in Hyderabad due to expected 38°C temperature spike."
-            </p>
-          </div>
+          <button className="w-full mt-2 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition shadow-sm">
+            Send Alert to AC Technicians
+          </button>
         </div>
 
-        <div className="p-4 rounded-2xl bg-blue-50/80 border border-blue-200 flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shrink-0 shadow">
-            <Wrench className="w-5 h-5" />
+        <div className="p-4 rounded-2xl bg-blue-50/80 border border-blue-200 flex flex-col justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shrink-0 shadow">
+              <Wrench className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="font-extrabold text-xs text-blue-900 block">AI Peak Hour Insight #2</span>
+              <p className="text-xs text-slate-700 leading-relaxed font-medium mt-0.5">
+                "Central Hyderabad (Banjara Hills & Gachibowli) has highest expected plumbing demand between <strong className="text-blue-900 font-bold">6 PM and 9 PM</strong>."
+              </p>
+            </div>
           </div>
-          <div>
-            <span className="font-extrabold text-xs text-blue-900 block">AI Peak Hour Insight #2</span>
-            <p className="text-xs text-slate-700 leading-relaxed font-medium mt-0.5">
-              "Central Hyderabad (Banjara Hills & Gachibowli) has highest expected plumbing demand between <strong className="text-blue-900 font-bold">6 PM and 9 PM</strong>."
-            </p>
-          </div>
+          <button className="w-full mt-2 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-sm">
+            Activate Peak Pricing (+15%)
+          </button>
         </div>
 
       </div>

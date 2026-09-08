@@ -64,7 +64,12 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in">
+    <div 
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="booking-wizard-title"
+    >
       <div className="bg-white rounded-3xl max-w-xl w-full shadow-2xl relative border border-slate-100 overflow-hidden text-slate-900">
         
         {/* Header */}
@@ -73,15 +78,19 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
             <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">
               Step {step} of 4 — Cooperative Service Booking
             </span>
-            <h3 className="text-lg font-extrabold text-white mt-0.5">
+            <h3 id="booking-wizard-title" className="text-lg font-extrabold text-white mt-0.5">
               {step === 1 && '1. Choose Worker Assignment'}
               {step === 2 && '2. Service Address & Schedule'}
               {step === 3 && '3. Describe Problem & Upload Photo'}
               {step === 4 && '4. Booking Confirmation & Fair Wage'}
             </h3>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full bg-slate-800 text-slate-400 hover:text-white transition">
-            <X className="w-5 h-5" />
+          <button 
+            onClick={onClose} 
+            className="p-2 rounded-full bg-slate-800 text-slate-400 hover:text-white transition"
+            aria-label="Close booking wizard"
+          >
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 

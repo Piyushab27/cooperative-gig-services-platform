@@ -4,6 +4,7 @@ import { rankWorkersByAI } from '../../utils/aiMatcher';
 import { WorkerWithScore } from '../../types';
 import { LandingHero } from './LandingHero';
 import { ServiceCategories } from './ServiceCategories';
+import { MarketplaceSearch } from './MarketplaceSearch';
 import { WorkerCard } from './WorkerCard';
 import { EmergencyModal } from './EmergencyModal';
 import { WorkerProfileModal } from './WorkerProfileModal';
@@ -21,6 +22,7 @@ export const CustomerView: React.FC = () => {
     workers,
     selectedCategory,
     searchQuery,
+    filterOptions,
     createBooking,
     activeBookingId,
     setActiveBookingId
@@ -39,8 +41,13 @@ export const CustomerView: React.FC = () => {
   const [isRatingOpen, setIsRatingOpen] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(500);
 
-  // Compute AI Rankings
-  const rankedWorkers = rankWorkersByAI(workers, selectedCategory, searchQuery);
+  // Compute AI Rankings and apply filters
+  const filteredWorkers = workers.filter(w => {
+    if (w.distanceKm > filterOptions.maxDistance) return false;
+    if (w.rating < filterOptions.minRating) return false;
+    return true;
+  });
+  const rankedWorkers = rankWorkersByAI(filteredWorkers, selectedCategory, searchQuery);
   const bestWorker = rankedWorkers[0];
 
   const handleStartBooking = (worker: WorkerWithScore) => {
@@ -145,6 +152,7 @@ export const CustomerView: React.FC = () => {
 
           {/* AI Search & Worker Results Header */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <MarketplaceSearch />
             <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
                 <div className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 text-[11px] font-extrabold px-3 py-0.5 rounded-full mb-1">

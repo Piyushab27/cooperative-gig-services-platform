@@ -45,27 +45,33 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in">
+    <div 
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="emergency-modal-title"
+    >
       <div className="bg-slate-900 border border-red-500/40 text-white rounded-3xl max-w-xl w-full p-6 shadow-2xl relative overflow-hidden">
         
         {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-full bg-slate-800 text-slate-400 hover:text-white transition"
+          aria-label="Close emergency modal"
         >
-          <X className="w-5 h-5" />
+          <X className="w-5 h-5" aria-hidden="true" />
         </button>
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-5">
           <div className="w-12 h-12 rounded-2xl bg-red-600/20 border border-red-500/50 flex items-center justify-center text-red-500 font-bold shrink-0 shadow-lg shadow-red-950">
-            <AlertTriangle className="w-7 h-7 animate-bounce" />
+            <AlertTriangle className="w-7 h-7 animate-bounce" aria-hidden="true" />
           </div>
           <div>
             <span className="text-red-400 font-extrabold text-xs uppercase tracking-widest bg-red-950/80 border border-red-500/30 px-2.5 py-0.5 rounded-full">
               🚨 Priority Dispatch
             </span>
-            <h3 className="text-xl font-extrabold text-white mt-1">
+            <h3 id="emergency-modal-title" className="text-xl font-extrabold text-white mt-1">
               Emergency Service Needed
             </h3>
           </div>

@@ -4,8 +4,11 @@ import { DemoBanner } from './components/common/DemoBanner';
 import { Navbar } from './components/common/Navbar';
 import { CustomerView } from './components/customer/CustomerView';
 import { WorkerDashboard } from './components/worker/WorkerDashboard';
-import { AdminDashboard } from './components/admin/AdminDashboard';
+import { FederationDashboard } from './components/admin/FederationDashboard';
+import { CooperativeDashboard } from './components/admin/CooperativeDashboard';
+import { SuperAdminDashboard } from './components/admin/SuperAdminDashboard';
 import { Handshake, Heart, ShieldCheck, Sparkles } from 'lucide-react';
+import { NotificationToast } from './components/common/NotificationToast';
 
 const MainApp: React.FC = () => {
   const { role } = useDemo();
@@ -14,6 +17,7 @@ const MainApp: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-emerald-500 selection:text-white">
       {/* Demo Quick Banner for Hackathon Judges */}
       <DemoBanner />
+      <NotificationToast />
 
       {/* Main Navbar */}
       <Navbar />
@@ -22,7 +26,9 @@ const MainApp: React.FC = () => {
       <main className="flex-1">
         {role === 'customer' && <CustomerView />}
         {role === 'worker' && <WorkerDashboard />}
-        {role === 'admin' && <AdminDashboard />}
+        {role === 'cooperative_admin' && <CooperativeDashboard />}
+        {role === 'federation_admin' && <FederationDashboard />}
+        {role === 'super_admin' && <SuperAdminDashboard />}
       </main>
 
       {/* Footer */}
