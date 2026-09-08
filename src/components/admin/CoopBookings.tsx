@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { Search, Filter, AlertTriangle, ArrowRight } from 'lucide-react';
+import { CoopBookingModal } from './CoopBookingModal';
+import { Booking } from '../../types';
 
 export const CoopBookings: React.FC = () => {
   const { bookings } = useDemo();
+  const coopBookings = bookings.filter(b => b.workerCooperative === 'Hyderabad Labour Cooperative Society');
+
   const [filter, setFilter] = useState<'all' | 'emergency'>('all');
+  const [modalBooking, setModalBooking] = useState<Booking | null>(null);
   
-  const displayBookings = bookings.filter(b => {
+  const displayBookings = coopBookings.filter(b => {
     if (filter === 'emergency') return b.isEmergency;
     return true;
   });
@@ -81,14 +86,19 @@ export const CoopBookings: React.FC = () => {
                   {booking.status.replace('_', ' ')}
                 </span>
                 
-                <button className="mt-2 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center gap-1">
-                  View Details <ArrowRight className="w-3 h-3" />
-                </button>
+                <button onClick={() => setModalBooking(booking)} className="mt-2 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center gap-1">View Details <ArrowRight className="w-3 h-3" /></button>
               </div>
 
             </div>
           ))}
         </div>
+      )}
+      {modalBooking && (
+        <CoopBookingModal
+          booking={modalBooking}
+          isOpen={!!modalBooking}
+          onClose={() => setModalBooking(null)}
+        />
       )}
     </div>
   );

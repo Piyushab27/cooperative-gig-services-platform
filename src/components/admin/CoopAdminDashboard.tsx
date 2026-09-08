@@ -5,6 +5,7 @@ import { CoopWorkerManagement } from './CoopWorkerManagement';
 import { CoopBookings } from './CoopBookings';
 import { CoopDisputes } from './CoopDisputes';
 import { CoopWelfare } from './CoopWelfare';
+import { CoopDemandAnalytics } from './CoopDemandAnalytics';
 
 export const CoopAdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'workers' | 'verification' | 'bookings' | 'disputes' | 'forecast' | 'welfare'>('dashboard');
@@ -121,11 +122,7 @@ export const CoopAdminDashboard: React.FC = () => {
       {activeTab === 'bookings' && <CoopBookings />}
       {activeTab === 'disputes' && <CoopDisputes />}
       {activeTab === 'welfare' && <CoopWelfare />}
-      {activeTab === 'forecast' && (
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 text-center">
-          <p className="text-sm font-bold text-slate-500 py-10">Demand Forecast (Reusing Federation AI Forecast Module)</p>
-        </div>
-      )}
+      {activeTab === 'forecast' && <CoopDemandAnalytics />}
 
     </div>
   );

@@ -14,7 +14,7 @@ import { MOCK_WORKERS } from '../data/mockWorkers';
 import { INITIAL_BOOKINGS } from '../data/mockBookings';
 import { TRANSLATIONS } from '../data/translations';
 import { calculateFairWage } from '../utils/fairWage';
-import { getSupabaseWorkers, getSupabaseBookings, createSupabaseComplaint, updateSupabaseBookingStatus, createEmergencyRequest } from '../services/supabaseService';
+import { getSupabaseWorkers, getSupabaseBookings, getSupabaseComplaints, createSupabaseComplaint, updateSupabaseBookingStatus, createEmergencyRequest, updateComplaintStatus as updateComplaintStatusApi } from '../services/supabaseService';
 
 interface WageConfig {
   workerPct: number;
@@ -78,8 +78,10 @@ interface DemoContextType {
   updateWorkerProfile: (workerId: string, updates: Partial<Worker>) => Promise<void>;
   toggleAvailability: (workerId: string) => Promise<void>;
   toggleEmergencyReady: (workerId: string) => Promise<void>;
-  approveWorker: (workerId: string) => void;
-  rejectWorker: (workerId: string) => void;
+  approveWorker: (workerId: string) => Promise<void>;
+  rejectWorker: (workerId: string) => Promise<void>;
+  complaints: any[];
+  updateComplaintStatusAction: (complaintId: string, status: string) => Promise<void>;
   // Demo Launcher
   triggerDemoJourney: (role: Role) => void;
 }
@@ -150,12 +152,16 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const supabaseWorkers = await getSupabaseWorkers();
         const supabaseBookings = await getSupabaseBookings();
+        const supabaseComplaints = await getSupabaseComplaints();
         
         if (supabaseWorkers.length > 0) {
           setWorkers(supabaseWorkers);
         }
         if (supabaseBookings.length > 0) {
           setBookings(supabaseBookings);
+        }
+        if (supabaseComplaints.length > 0) {
+          setComplaints(supabaseComplaints);
         }
       } catch (err) {
         console.error("Failed to load Supabase data:", err);
@@ -188,6 +194,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isEmergencyModalOpen, setEmergencyModalOpen] = useState<boolean>(false);
   const [messages, setMessages] = useState<Record<string, ChatMessage[]>>(INITIAL_MESSAGES);
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
+  const [complaints, setComplaints] = useState<any[]>([]);
   const [wageConfig, setWageConfig] = useState<WageConfig>({
     workerPct: 85,
     coopPct: 10,
@@ -328,12 +335,26 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const approveWorker = (workerId: string) => {
+  
+  const approveWorker = async (workerId: string) => {
     setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, verificationStatus: 'verified' } : w));
+    try {
+      const { updateWorkerVerification } = await import('../services/supabaseService');
+      await updateWorkerVerification(workerId, 'verified');
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const rejectWorker = (workerId: string) => {
-    setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, verificationStatus: 'pending' } : w));
+  
+  const rejectWorker = async (workerId: string) => {
+    setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, verificationStatus: 'rejected' } : w));
+    try {
+      const { updateWorkerVerification } = await import('../services/supabaseService');
+      await updateWorkerVerification(workerId, 'rejected');
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   
@@ -409,6 +430,19 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateComplaintStatusAction = async (complaintId: string, status: string) => {
+    // Optimistic
+    setComplaints(prev => prev.map(c => c.id === complaintId ? { ...c, status } : c));
+    try {
+      await updateComplaintStatusApi(complaintId, status);
+    } catch (err) {
+      console.error("Failed to update complaint status:", err);
+      // revert
+      setComplaints(prev => prev.map(c => c.id === complaintId ? { ...c, status: 'UNDER REVIEW' } : c));
+      throw err;
+    }
+  };
+
   const markMessagesRead = (bookingId: string, userId: string) => {
     // Mock implementation
   };
@@ -465,6 +499,8 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toggleEmergencyReady,
         approveWorker,
         rejectWorker,
+        complaints,
+        updateComplaintStatusAction,
         triggerDemoJourney,
       }}
     >

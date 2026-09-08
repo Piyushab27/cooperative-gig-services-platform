@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { Search, Filter, ShieldCheck, ShieldAlert, CheckCircle2, XCircle } from 'lucide-react';
+import { WorkerAdminModal } from './WorkerAdminModal';
+import { Worker } from '../../types';
 
 export const CoopWorkerManagement: React.FC<{ view: 'list' | 'verification' }> = ({ view }) => {
   const { workers, approveWorker, rejectWorker } = useDemo();
-  const [searchTerm, setSearchTerm] = useState('');
+  const coopWorkers = workers.filter(w => w.cooperativeName === 'Hyderabad Labour Cooperative Society' || w.cooperativeId === 'HLCS-2021-089');
 
-  const displayWorkers = workers.filter(w => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [modalWorker, setModalWorker] = useState<{worker: Worker, tab: 'profile' | 'manage'} | null>(null);
+
+  const displayWorkers = coopWorkers.filter(w => {
     if (view === 'verification') {
       return w.verificationStatus === 'pending';
     }
@@ -95,15 +100,11 @@ export const CoopWorkerManagement: React.FC<{ view: 'list' | 'verification' }> =
                 </div>
               ) : (
                 <div className="flex gap-2">
-                  <button className="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-sm transition">
-                    View Profile
-                  </button>
-                  <button className="flex-1 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold border border-slate-200 transition">
-                    Manage
-                  </button>
+                  <button onClick={() => setModalWorker({ worker, tab: 'profile' })} className="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-sm transition">View Profile</button>
+                  <button onClick={() => setModalWorker({ worker, tab: 'manage' })} className="flex-1 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold border border-slate-200 transition">Manage</button>
                 </div>
               )}
-              {worker.isAvailable && (
+              {worker.isEmergencyReady && (
                 <div className="text-[10px] font-extrabold text-rose-600 bg-rose-50 px-2 py-1 rounded-lg text-center uppercase tracking-wider">
                   Emergency Ready
                 </div>
@@ -114,6 +115,14 @@ export const CoopWorkerManagement: React.FC<{ view: 'list' | 'verification' }> =
         ))}
       </div>
 
+      {modalWorker && (
+        <WorkerAdminModal
+          worker={modalWorker.worker}
+          isOpen={!!modalWorker}
+          onClose={() => setModalWorker(null)}
+          initialTab={modalWorker.tab}
+        />
+      )}
     </div>
   );
 };

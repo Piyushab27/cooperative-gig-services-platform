@@ -351,3 +351,94 @@ export const createSupabaseBooking = async (booking: any) => {
 
   return data;
 };
+
+export const getCooperative = async (coopId: string) => {
+  const { data, error } = await supabase.from('cooperatives').select('*').eq('id', coopId).single();
+  if (error) throw error;
+  return data;
+};
+
+export const getCooperativeWorkers = async (coopId: string) => {
+  const { data, error } = await supabase.from('workers').select('*, worker_skills(skill), worker_certifications(certification), welfare(status, fund_balance), insurance(status, coverage_details)').eq('cooperative_id', coopId);
+  if (error) throw error;
+  return data;
+};
+
+export const getCooperativeBookings = async (coopId: string) => {
+  const { data, error } = await supabase.from('bookings').select('*, workers!inner(cooperative_id)').eq('workers.cooperative_id', coopId);
+  if (error) throw error;
+  return data;
+};
+
+export const getWorkerDetails = async (workerId: string) => {
+  return getWorkerProfile(workerId);
+};
+
+export const updateWorkerVerification = async (workerId: string, status: string) => {
+  const { error } = await supabase.from('workers').update({ verification_status: status }).eq('id', workerId);
+  if (error) throw error;
+};
+
+export const getBookingDetails = async (bookingId: string) => {
+  const { data, error } = await supabase.from('bookings').select('*, workers(name, rating, category, cooperatives(name)), customers(name, phone, address, lat, lng)').eq('id', bookingId).single();
+  if (error) throw error;
+  return data;
+};
+
+export const getBookingStatusHistory = async (bookingId: string) => {
+  const { data, error } = await supabase.from('booking_status_history').select('*').eq('booking_id', bookingId).order('changed_at', { ascending: false });
+  if (error) throw error;
+  return data;
+};
+
+export const getCooperativeComplaints = async (coopId: string) => {
+  const { data, error } = await supabase.from('complaints').select('*, workers!inner(cooperative_id, name), customers(name)').eq('workers.cooperative_id', coopId);
+  if (error) throw error;
+  return data;
+};
+
+export const getComplaintDetails = async (complaintId: string) => {
+  const { data, error } = await supabase.from('complaints').select('*, workers(name, cooperatives(name)), customers(name)').eq('id', complaintId).single();
+  if (error) throw error;
+  return data;
+};
+
+export const updateComplaintStatus = async (complaintId: string, status: string) => {
+  const { error } = await supabase.from('complaints').update({ status }).eq('id', complaintId);
+  if (error) throw error;
+};
+
+export const getSupabaseComplaints = async () => {
+  const { data, error } = await supabase
+    .from('complaints')
+    .select('*, workers(name, cooperative_id, cooperatives(name)), customers(name)')
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('Error fetching complaints:', error);
+    return [];
+  }
+  return (data || []).map((c: any) => ({
+    id: c.id,
+    bookingId: c.booking_id,
+    customerId: c.customer_id,
+    customerName: c.customers?.name || 'Unknown',
+    workerId: c.worker_id,
+    workerName: c.workers?.name || 'Unknown',
+    workerCooperativeId: c.workers?.cooperative_id,
+    workerCooperative: c.workers?.cooperatives?.name || 'Unknown',
+    category: c.category,
+    description: c.description,
+    amount: Number(c.amount || 0),
+    details: c.details,
+    status: c.status,
+    createdAt: c.created_at,
+    resolvedAt: c.resolved_at,
+  }));
+};
+
+export const getCooperativeDemandAnalytics = async (coopId: string) => {
+  // Aggregate from bookings
+  const { data, error } = await supabase.from('bookings').select('service_category, is_emergency, status, workers!inner(cooperative_id)').eq('workers.cooperative_id', coopId);
+  if (error) throw error;
+  return data;
+};

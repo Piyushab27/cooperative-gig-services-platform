@@ -29,7 +29,7 @@ export interface Worker {
   basePrice: number;
   cooperativeName: string;
   cooperativeId: string;
-  verificationStatus: 'verified' | 'under_review' | 'pending';
+  verificationStatus: 'verified' | 'under_review' | 'pending' | 'rejected';
   verificationBadge: string;
   skills: string[];
   languages: string[];

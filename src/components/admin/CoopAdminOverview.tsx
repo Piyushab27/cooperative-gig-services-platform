@@ -3,20 +3,25 @@ import { useDemo } from '../../context/DemoContext';
 import { Users, AlertTriangle, TrendingUp, ArrowRight, ShieldCheck, DollarSign, Activity } from 'lucide-react';
 
 export const CoopAdminOverview: React.FC<{ onNavigate: (tab: any) => void }> = ({ onNavigate }) => {
-  const { workers, bookings } = useDemo();
+  const { workers, bookings, complaints } = useDemo();
+  const coopWorkers = workers.filter(w => w.cooperativeName === 'Hyderabad Labour Cooperative Society' || w.cooperativeId === 'HLCS-2021-089');
+  const coopBookings = bookings.filter(b => b.workerCooperative === 'Hyderabad Labour Cooperative Society');
+  const coopComplaints = complaints.filter(c => c.workerCooperative === 'Hyderabad Labour Cooperative Society');
+  const openDisputes = coopComplaints.filter(c => c.status === 'UNDER REVIEW').length;
+
 
   // Basic stats
-  const totalWorkers = workers.length;
-  const verifiedWorkers = workers.filter(w => w.verificationStatus === 'verified').length;
-  const pendingVerification = workers.filter(w => w.verificationStatus === 'pending').length;
+  const totalWorkers = coopWorkers.length;
+  const verifiedWorkers = coopWorkers.filter(w => w.verificationStatus === 'verified').length;
+  const pendingVerification = coopWorkers.filter(w => w.verificationStatus === 'pending').length;
 
-  const activeBookings = bookings.filter(b => ['requested', 'accepted', 'on_the_way', 'arrived', 'in_progress'].includes(b.status));
+  const activeBookings = coopBookings.filter(b => ['requested', 'accepted', 'on_the_way', 'arrived', 'in_progress'].includes(b.status));
   const emergencyBookings = activeBookings.filter(b => b.isEmergency);
-  const completedToday = bookings.filter(b => b.status === 'completed' && b.scheduledDate === 'Today').length;
+  const completedToday = coopBookings.filter(b => b.status === 'completed' && b.scheduledDate === 'Today').length;
 
-  const revenue = bookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + (b.wageBreakdown?.totalPaid || 0), 0);
-  const workerEarnings = bookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + (b.wageBreakdown?.workerEarnings || 0), 0);
-  const welfare = bookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + (b.wageBreakdown?.welfareContribution || 0), 0);
+  const revenue = coopBookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + (b.wageBreakdown?.totalPaid || 0), 0);
+  const workerEarnings = coopBookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + (b.wageBreakdown?.workerEarnings || 0), 0);
+  const welfare = coopBookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + (b.wageBreakdown?.welfareContribution || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -78,10 +83,12 @@ export const CoopAdminOverview: React.FC<{ onNavigate: (tab: any) => void }> = (
                 <ArrowRight className="w-4 h-4 text-rose-400" />
               </button>
             )}
+            {openDisputes > 0 && (
             <button onClick={() => onNavigate('disputes')} className="w-full bg-white p-3 rounded-2xl border border-orange-200 flex items-center justify-between hover:border-orange-400 transition">
-              <span className="text-xs font-bold text-orange-700">🟠 1 unresolved customer complaint</span>
+              <span className="text-xs font-bold text-orange-700">🟠 {openDisputes} unresolved customer complaint{openDisputes !== 1 ? 's' : ''}</span>
               <ArrowRight className="w-4 h-4 text-orange-400" />
             </button>
+            )}
           </div>
         </div>
 
