@@ -1,5 +1,5 @@
 import React from 'react';
-import { WorkerWithScore } from '../../types';
+import { Worker } from '../../types';
 import { VerifiedBadge } from '../common/VerifiedBadge';
 import { FairWageCard } from '../common/FairWageCard';
 import {
@@ -18,9 +18,9 @@ import {
 } from 'lucide-react';
 
 interface WorkerProfileModalProps {
-  worker: WorkerWithScore | null;
+  worker: Worker | null;
   onClose: () => void;
-  onBookNow: (worker: WorkerWithScore) => void;
+  onBookNow: (worker: Worker) => void;
 }
 
 export const WorkerProfileModal: React.FC<WorkerProfileModalProps> = ({
@@ -69,26 +69,6 @@ export const WorkerProfileModal: React.FC<WorkerProfileModalProps> = ({
 
         <div className="p-6 space-y-6">
 
-          {/* AI Recommendation Spotlight Box */}
-          <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-1.5 font-extrabold text-emerald-900 text-sm">
-                <Sparkles className="w-4 h-4 text-emerald-600" />
-                <span>AI Smart Recommendation — {worker.aiMatch.totalScore}% Match</span>
-              </div>
-              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
-                Rank #1 Recommendation
-              </span>
-            </div>
-            <ul className="space-y-1 text-xs text-slate-700 font-medium">
-              {worker.aiMatch.reasons.map((reason, idx) => (
-                <li key={idx} className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>{reason}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
 
           {/* Quick Metrics */}
           <div className="grid grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded-2xl text-center border border-slate-200">

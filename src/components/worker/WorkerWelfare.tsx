@@ -1,10 +1,19 @@
 import React from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { Heart, ShieldCheck, Award, AlertCircle, BookOpen, Users, CheckCircle2 } from 'lucide-react';
+import { WelfareClaimModal } from './WelfareClaimModal';
 
 export const WorkerWelfare: React.FC = () => {
   const { workers, activeWorkerId } = useDemo();
   const worker = workers.find(w => w.id === activeWorkerId) || workers[0];
+
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [claimType, setClaimType] = React.useState<'insurance' | 'emergency'>('insurance');
+
+  const handleOpenModal = (type: 'insurance' | 'emergency') => {
+    setClaimType(type);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -48,8 +57,11 @@ export const WorkerWelfare: React.FC = () => {
               Coverage up to <strong className="text-slate-900 font-bold">{worker.insuranceCoverage}</strong> for worker and immediate family members.
             </p>
           </div>
-          <button className="w-full py-2 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold hover:bg-slate-200 transition">
-            View Insurance Card
+          <button 
+            onClick={() => handleOpenModal('insurance')}
+            className="w-full py-2 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold hover:bg-emerald-100 transition"
+          >
+            Claim Insurance
           </button>
         </div>
 
@@ -67,7 +79,10 @@ export const WorkerWelfare: React.FC = () => {
               Instant 24/7 liquidity loan assistance up to ₹50,000 for medical or family emergencies.
             </p>
           </div>
-          <button className="w-full py-2 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold hover:bg-slate-200 transition">
+          <button 
+            onClick={() => handleOpenModal('emergency')}
+            className="w-full py-2 rounded-xl bg-rose-50 text-rose-700 text-xs font-bold hover:bg-rose-100 transition"
+          >
             Request Emergency Aid
           </button>
         </div>
@@ -93,6 +108,11 @@ export const WorkerWelfare: React.FC = () => {
 
       </div>
 
+      <WelfareClaimModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        claimType={claimType}
+      />
     </div>
   );
 };

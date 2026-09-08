@@ -29,8 +29,3 @@ dist-ssr/
 *.njsproj
 *.sln
 *.sw?
-
-# Scratch scripts
-check_db.js
-patch_login.js
-test-browser*.js

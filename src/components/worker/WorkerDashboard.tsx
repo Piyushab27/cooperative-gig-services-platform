@@ -4,6 +4,8 @@ import { WorkerHeader } from './WorkerHeader';
 import { AIRecommendedJobs } from './AIRecommendedJobs';
 import { WorkerEarnings } from './WorkerEarnings';
 import { WorkerWelfare } from './WorkerWelfare';
+import { WorkerProfileEditor } from './WorkerProfileEditor';
+import { InteractiveMap } from '../common/InteractiveMap';
 import {
   Briefcase,
   DollarSign,
@@ -19,9 +21,9 @@ import {
 
 export const WorkerDashboard: React.FC = () => {
   const { bookings, updateBookingStatus, activeBookingId, setActiveBookingId } = useDemo();
-  const [activeTab, setActiveTab] = useState<'jobs' | 'earnings' | 'welfare' | 'verification'>('jobs');
+  const [activeTab, setActiveTab] = useState<'jobs' | 'earnings' | 'welfare' | 'verification' | 'profile'>('jobs');
 
-  const activeJob = bookings.find(b => b.id === activeBookingId);
+  const activeJob = bookings.find(b => b.id === activeBookingId && b.status !== 'completed');
 
   const handleAcceptJob = (bookingId: string) => {
     updateBookingStatus(bookingId, 'accepted');
@@ -48,32 +50,43 @@ export const WorkerDashboard: React.FC = () => {
 
       {/* Active Job Progress Controller Bar if Job Active */}
       {activeJob && (
-        <div className="bg-gradient-to-r from-emerald-900 to-teal-900 text-white p-5 rounded-3xl shadow-xl border border-emerald-500/50 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in slide-in-from-top">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="bg-emerald-500 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">
-                Active Job Assigned ({activeJob.id})
-              </span>
-              <span className="text-xs font-bold text-amber-300">
-                Status: {activeJob.status.replace('_', ' ').toUpperCase()}
-              </span>
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-emerald-900 to-teal-900 text-white p-5 rounded-3xl shadow-xl border border-emerald-500/50 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in slide-in-from-top">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="bg-emerald-500 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">
+                  Active Job Assigned ({activeJob.id})
+                </span>
+                <span className="text-xs font-bold text-amber-300">
+                  Status: {activeJob.status.replace('_', ' ').toUpperCase()}
+                </span>
+              </div>
+              <h4 className="text-lg font-extrabold text-white mt-1">{activeJob.serviceTitle}</h4>
+              <p className="text-xs text-slate-200 mt-0.5">
+                Customer: <strong className="text-white">{activeJob.customerName}</strong> ({activeJob.customerAddress})
+              </p>
             </div>
-            <h4 className="text-lg font-extrabold text-white mt-1">{activeJob.serviceTitle}</h4>
-            <p className="text-xs text-slate-200 mt-0.5">
-              Customer: <strong className="text-white">{activeJob.customerName}</strong> ({activeJob.customerAddress})
-            </p>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleAdvanceJobStatus}
-              disabled={activeJob.status === 'completed'}
-              className={`px-5 py-2.5 rounded-2xl ${activeJob.status === 'completed' ? 'bg-slate-600 cursor-not-allowed opacity-80' : 'bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-950'} text-white font-extrabold text-xs flex items-center gap-1.5 transition`}
-            >
-              <span>{activeJob.status === 'completed' ? 'JOB COMPLETED' : `ADVANCE JOB STEP (${activeJob.status === 'accepted' ? 'On The Way' : activeJob.status === 'on_the_way' ? 'Mark Arrived' : activeJob.status === 'arrived' ? 'Start Service' : 'Finish Job'})`}</span>
-              {activeJob.status !== 'completed' && <ChevronRight className="w-4 h-4" />}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleAdvanceJobStatus}
+                className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-xs shadow-lg shadow-emerald-950 flex items-center gap-1.5 transition"
+              >
+                <span>ADVANCE JOB STEP ({activeJob.status === 'accepted' ? 'On The Way' : activeJob.status === 'on_the_way' ? 'Mark Arrived' : activeJob.status === 'arrived' ? 'Start Service' : 'Finish Job'})</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
+          <InteractiveMap
+            customerLocationName="Banjara Hills, Hyderabad"
+            workerName="You"
+            workerPhoto="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=400&auto=format&fit=crop&q=80"
+            workerCategory="Electrician"
+            distanceKm={2.1}
+            etaMinutes={activeJob.status === 'on_the_way' ? 8 : activeJob.status === 'arrived' ? 0 : 5}
+            statusText={`Status: ${activeJob.status.replace('_', ' ').toUpperCase()}`}
+            heightClass="h-48"
+          />
         </div>
       )}
 
@@ -89,6 +102,18 @@ export const WorkerDashboard: React.FC = () => {
         >
           <Briefcase className="w-4 h-4" />
           <span>AI Recommended Jobs</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('profile')}
+          className={`px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 ${
+            activeTab === 'profile'
+              ? 'bg-emerald-600 text-white shadow-md'
+              : 'bg-white text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <UserCheck className="w-4 h-4" />
+          <span>My Profile</span>
         </button>
 
         <button
@@ -130,6 +155,7 @@ export const WorkerDashboard: React.FC = () => {
 
       {/* Tab Contents */}
       {activeTab === 'jobs' && <AIRecommendedJobs onAcceptJob={handleAcceptJob} />}
+      {activeTab === 'profile' && <WorkerProfileEditor />}
       {activeTab === 'earnings' && <WorkerEarnings />}
       {activeTab === 'welfare' && <WorkerWelfare />}
       {activeTab === 'verification' && (

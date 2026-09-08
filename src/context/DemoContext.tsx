@@ -21,6 +21,11 @@ interface WageConfig {
   welfarePct: number;
 }
 
+interface FilterOptions {
+  maxDistance: number;
+  minRating: number;
+}
+
 interface DemoContextType {
   role: Role;
   language: Language;
@@ -38,13 +43,18 @@ interface DemoContextType {
   setSelectedCategory: (cat: ServiceCategory) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
+  filterOptions: FilterOptions;
+  setFilterOptions: (options: FilterOptions) => void;
+  isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
   notifications: NotificationItem[];
   markNotificationRead: (id: string) => void;
   messages: Record<string, ChatMessage[]>;
   sendMessage: (bookingId: string, text: string, sender: 'customer' | 'worker') => void;
+  markMessagesRead: (bookingId: string, userId: string) => void;
   wageConfig: WageConfig;
   setWageConfig: (config: WageConfig) => void;
-  // Booking operations
+  // Booking mutations
   createBooking: (details: {
     category: ServiceCategory;
     worker: Worker;
@@ -58,6 +68,8 @@ interface DemoContextType {
   }) => Booking;
   updateBookingStatus: (bookingId: string, status: BookingStatus) => void;
   submitRating: (bookingId: string, rating: number, comment: string, tags: string[]) => void;
+  updateWorkerProfile: (workerId: string, updates: Partial<Worker>) => void;
+  toggleAvailability: (workerId: string) => void;
   approveWorker: (workerId: string) => void;
   rejectWorker: (workerId: string) => void;
   // Demo Launcher
@@ -134,6 +146,11 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [activeWorkerId, setActiveWorkerId] = useState<string>('w-1');
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory>('electrician');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+    maxDistance: 10,
+    minRating: 0,
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [messages, setMessages] = useState<Record<string, ChatMessage[]>>(INITIAL_MESSAGES);
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
   const [wageConfig, setWageConfig] = useState<WageConfig>({
@@ -309,6 +326,18 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, verificationStatus: 'pending' } : w));
   };
 
+  const updateWorkerProfile = (workerId: string, updates: Partial<Worker>) => {
+    setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, ...updates } : w));
+  };
+
+  const toggleAvailability = (workerId: string) => {
+    setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, isAvailable: !w.isAvailable } : w));
+  };
+
+  const markMessagesRead = (bookingId: string, userId: string) => {
+    // Mock implementation
+  };
+
   const triggerDemoJourney = (targetRole: Role) => {
     console.log(`Demo Journey triggered for ${targetRole} - Action disabled due to Real Auth.`);
   };
@@ -332,15 +361,22 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSelectedCategory,
         searchQuery,
         setSearchQuery,
+        filterOptions,
+        setFilterOptions,
+        isLoading,
+        setIsLoading,
         notifications,
         markNotificationRead,
         messages,
         sendMessage,
+        markMessagesRead,
         wageConfig,
         setWageConfig,
         createBooking,
         updateBookingStatus,
         submitRating,
+        updateWorkerProfile,
+        toggleAvailability,
         approveWorker,
         rejectWorker,
         triggerDemoJourney,

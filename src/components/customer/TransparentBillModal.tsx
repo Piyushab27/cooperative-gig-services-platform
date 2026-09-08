@@ -111,21 +111,13 @@ export const TransparentBillModal: React.FC<TransparentBillModalProps> = ({
             <span className="text-xl font-extrabold text-slate-900">₹{totalAmount}</span>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-            <button
-              onClick={onClose}
-              className="px-6 py-3 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-sm transition w-full sm:w-auto text-center"
-            >
-              CLOSE
-            </button>
-            <button
-              onClick={() => onProceedToPayment(totalAmount)}
-              className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm transition shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-2 w-full sm:w-auto"
-            >
-              <span>PROCEED TO DIGITAL PAYMENT</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            onClick={() => onProceedToPayment(totalAmount)}
+            className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm transition shadow-xl shadow-emerald-600/30 flex items-center gap-2"
+          >
+            <span>PROCEED TO DIGITAL PAYMENT</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
 
       </div>

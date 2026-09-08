@@ -135,20 +135,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={onClose}
-                className="w-full sm:w-1/3 py-3.5 rounded-2xl bg-white border border-slate-200 text-slate-700 font-bold text-sm hover:bg-slate-50 transition"
-              >
-                CANCEL
-              </button>
-              <button
-                onClick={handleSimulatePayment}
-                className="w-full sm:w-2/3 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow-xl shadow-emerald-600/30 transition"
-              >
-                SIMULATE INSTANT UPI PAYMENT (₹{amount})
-              </button>
-            </div>
+            <button
+              onClick={handleSimulatePayment}
+              className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow-xl shadow-emerald-600/30 transition"
+            >
+              SIMULATE INSTANT UPI PAYMENT (₹{amount})
+            </button>
           </div>
         )}
 

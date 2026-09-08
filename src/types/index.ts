@@ -1,4 +1,4 @@
-export type Role = 'customer' | 'worker' | 'admin';
+export type Role = 'customer' | 'worker' | 'admin' | 'cooperative_admin' | 'federation_admin' | 'super_admin';
 
 export type Language = 'en' | 'te' | 'hi';
 
@@ -31,6 +31,7 @@ export interface Worker {
   verificationStatus: 'verified' | 'under_review' | 'pending';
   verificationBadge: string;
   skills: string[];
+  languages: string[];
   certifications: string[];
   bio: string;
   lat: number;

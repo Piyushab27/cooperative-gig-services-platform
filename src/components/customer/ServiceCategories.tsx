@@ -41,10 +41,10 @@ export const ServiceCategories: React.FC = () => {
   const { selectedCategory, setSelectedCategory } = useDemo();
 
   return (
-    <section className="py-10 bg-slate-50 border-b border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="pb-6">
+      <div className="w-[92%] max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-4 gap-2">
           <div>
             <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider bg-emerald-100 px-3 py-1 rounded-full">
               Explore Services
@@ -53,7 +53,7 @@ export const ServiceCategories: React.FC = () => {
               Cooperative Skilled Trades
             </h2>
             <p className="text-slate-500 text-xs sm:text-sm mt-1">
-              Select a service category to activate AI Smart Worker Matching
+              Select a service category to view available workers
             </p>
           </div>
         </div>
@@ -69,11 +69,20 @@ export const ServiceCategories: React.FC = () => {
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`p-4 rounded-2xl text-left transition-all duration-200 relative group flex flex-col justify-between border ${
                   isSelected
-                    ? 'bg-white border-emerald-500 shadow-xl ring-2 ring-emerald-500/30 transform -translate-y-1'
-                    : 'bg-white border-slate-200/80 hover:border-emerald-300 hover:shadow-md'
+                    ? 'bg-emerald-50 border-emerald-500 shadow-md ring-2 ring-emerald-500/30 transform -translate-y-1'
+                    : 'bg-white border-slate-200/80 hover:border-emerald-300 hover:shadow-sm'
                 }`}
               >
-                {cat.badge && (
+                {/* Active checkmark */}
+                {isSelected && (
+                  <div className="absolute top-2 right-2 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm">
+                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                )}
+                
+                {cat.badge && !isSelected && (
                   <span className="absolute top-2 right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200">
                     {cat.badge}
                   </span>
@@ -90,6 +99,11 @@ export const ServiceCategories: React.FC = () => {
                   <p className="text-[11px] text-slate-400 font-medium mt-0.5 line-clamp-1">
                     {cat.sublabel}
                   </p>
+                  {isSelected && (
+                    <p className="text-[10px] text-emerald-700 font-bold mt-1">
+                      Selected ✓
+                    </p>
+                  )}
                 </div>
               </button>
             );

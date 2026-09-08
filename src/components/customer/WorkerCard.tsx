@@ -1,12 +1,12 @@
 import React from 'react';
-import { WorkerWithScore } from '../../types';
+import { Worker } from '../../types';
 import { VerifiedBadge } from '../common/VerifiedBadge';
-import { Sparkles, Star, MapPin, Award, Clock, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { Star, MapPin, Award, Clock, ArrowRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 interface WorkerCardProps {
-  worker: WorkerWithScore;
-  onSelectProfile: (worker: WorkerWithScore) => void;
-  onBookNow: (worker: WorkerWithScore) => void;
+  worker: Worker;
+  onSelectProfile: (worker: Worker) => void;
+  onBookNow: (worker: Worker) => void;
   isBestMatch?: boolean;
 }
 
@@ -16,8 +16,6 @@ export const WorkerCard: React.FC<WorkerCardProps> = ({
   onBookNow,
   isBestMatch = false,
 }) => {
-  const matchPct = worker.aiMatch.totalScore;
-
   return (
     <div
       className={`bg-white rounded-3xl p-5 transition-all duration-300 border relative flex flex-col justify-between group ${
@@ -26,16 +24,8 @@ export const WorkerCard: React.FC<WorkerCardProps> = ({
           : 'border-slate-200 hover:border-emerald-300 hover:shadow-xl'
       }`}
     >
-      {/* Top Banner for Best AI Match */}
-      {isBestMatch && (
-        <div className="absolute -top-3 left-6 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-[11px] font-extrabold px-3 py-0.5 rounded-full shadow-md flex items-center gap-1.5 uppercase tracking-wide">
-          <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-          <span>BEST AI MATCH</span>
-        </div>
-      )}
-
       <div>
-        {/* Worker Header: Photo + AI Score Badge */}
+        {/* Worker Header: Photo + Badge */}
         <div className="flex items-start justify-between gap-3 mb-3 pt-1">
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -60,15 +50,6 @@ export const WorkerCard: React.FC<WorkerCardProps> = ({
                 <VerifiedBadge cooperativeName={worker.cooperativeName} size="sm" />
               </div>
             </div>
-          </div>
-
-          {/* AI Match Score Circular Badge */}
-          <div className="flex flex-col items-end shrink-0">
-            <div className="bg-gradient-to-br from-emerald-600 to-teal-700 text-white font-extrabold px-2.5 py-1 rounded-xl shadow-md text-xs flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-300" />
-              <span>{matchPct}% Match</span>
-            </div>
-            <span className="text-[10px] text-slate-400 font-bold mt-0.5">AI Smart Match</span>
           </div>
         </div>
 
@@ -97,17 +78,6 @@ export const WorkerCard: React.FC<WorkerCardProps> = ({
             </div>
             <div className="text-[10px] text-slate-400 font-medium">Experience</div>
           </div>
-        </div>
-
-        {/* AI Rationale Summary Box */}
-        <div className="bg-emerald-50/60 p-2.5 rounded-2xl border border-emerald-100/80 mb-3 text-[11px]">
-          <div className="flex items-center gap-1 text-emerald-900 font-extrabold mb-1">
-            <Sparkles className="w-3 h-3 text-emerald-600" />
-            <span>Why AI Recommended:</span>
-          </div>
-          <p className="text-slate-600 leading-relaxed font-medium line-clamp-2">
-            "{worker.aiMatch.reasons[0] || 'Top skill match & low workload'}. {worker.aiMatch.reasons[1] || ''}"
-          </p>
         </div>
 
         {/* Skill Pills */}
