@@ -6,6 +6,7 @@ import { SignUp } from './components/auth/SignUp';
 import { Navbar } from './components/common/Navbar';
 import { CustomerView } from './components/customer/CustomerView';
 import { WorkerDashboard } from './components/worker/WorkerDashboard';
+import { CoopAdminDashboard } from './components/admin/CoopAdminDashboard';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { Handshake, Heart, ShieldCheck, Sparkles } from 'lucide-react';
 
@@ -38,7 +39,8 @@ const MainApp: React.FC = () => {
         
         {/* Dashboards strictly require authenticated role */}
         {demoRole === 'worker' && <WorkerDashboard />}
-        {authRole === 'admin' && user && <AdminDashboard />}
+        {demoRole === 'cooperative_admin' && <CoopAdminDashboard />}
+        {demoRole === 'federation_admin' && <AdminDashboard />}
       </main>
 
       {/* Footer */}
