@@ -4,7 +4,18 @@ import { FairWageCard } from '../common/FairWageCard';
 import { ShieldCheck, TrendingUp, Heart, Landmark, CheckCircle2, ArrowUpRight, DollarSign } from 'lucide-react';
 
 export const WorkerEarnings: React.FC = () => {
-  const { wageConfig } = useDemo();
+  
+  const { wageConfig, bookings, activeWorkerId } = useDemo();
+
+  const workerBookings = bookings.filter(b => b.workerId === activeWorkerId);
+  const completedBookings = workerBookings.filter(b => b.status === 'completed');
+  const pendingBookings = workerBookings.filter(b => b.status !== 'completed' && b.status !== 'cancelled');
+
+  const totalEarnings = completedBookings.reduce((sum, b) => sum + (b.wageBreakdown?.workerEarnings || 0), 0);
+  const pendingEarnings = pendingBookings.reduce((sum, b) => sum + (b.wageBreakdown?.workerEarnings || 0), 0);
+  const coopContrib = completedBookings.reduce((sum, b) => sum + (b.wageBreakdown?.cooperativeContribution || 0), 0);
+  const welfareContrib = completedBookings.reduce((sum, b) => sum + (b.wageBreakdown?.welfareContribution || 0), 0);
+
 
   return (
     <div className="space-y-6">
@@ -13,27 +24,27 @@ export const WorkerEarnings: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Today's Payout</span>
-          <span className="text-2xl font-extrabold text-emerald-700 mt-1 block">₹1,250</span>
+          <span className="text-2xl font-extrabold text-emerald-700 mt-1 block">₹{totalEarnings.toFixed(0)}</span>
           <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
-            <ArrowUpRight className="w-3 h-3" /> 3 Jobs Completed Today
+            <ArrowUpRight className="w-3 h-3" /> {completedBookings.length} Jobs Completed
           </span>
         </div>
 
         <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">This Week</span>
-          <span className="text-2xl font-extrabold text-slate-900 mt-1 block">₹7,840</span>
-          <span className="text-[10px] text-slate-500 font-semibold mt-1 block">18 Jobs Completed</span>
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Pending Earnings</span>
+          <span className="text-2xl font-extrabold text-slate-900 mt-1 block">₹{pendingEarnings.toFixed(0)}</span>
+          <span className="text-[10px] text-slate-500 font-semibold mt-1 block">{pendingBookings.length} Pending Jobs</span>
         </div>
 
         <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">This Month</span>
-          <span className="text-2xl font-extrabold text-slate-900 mt-1 block">₹28,450</span>
-          <span className="text-[10px] text-slate-500 font-semibold mt-1 block">86 Total Jobs</span>
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Co-op Contribution</span>
+          <span className="text-2xl font-extrabold text-slate-900 mt-1 block">₹{coopContrib.toFixed(0)}</span>
+          <span className="text-[10px] text-slate-500 font-semibold mt-1 block">For cooperative growth</span>
         </div>
 
         <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Welfare Balance</span>
-          <span className="text-2xl font-extrabold text-amber-600 mt-1 block">₹18,450</span>
+          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Welfare Contribution</span>
+          <span className="text-2xl font-extrabold text-amber-600 mt-1 block">₹{welfareContrib.toFixed(0)}</span>
           <span className="text-[10px] text-amber-700 font-semibold mt-1 block">Active Pension & Health</span>
         </div>
       </div>

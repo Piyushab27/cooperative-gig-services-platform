@@ -4,10 +4,10 @@ import { VerifiedBadge } from '../common/VerifiedBadge';
 import { Power, Star, AlertTriangle } from 'lucide-react';
 
 export const WorkerHeader: React.FC = () => {
-  const { workers, activeWorkerId, toggleAvailability } = useDemo();
+  const { workers, activeWorkerId, toggleAvailability, toggleEmergencyReady } = useDemo();
   const worker = workers.find(w => w.id === activeWorkerId) || workers[0];
 
-  const [emergencyOn, setEmergencyOn] = useState(true);
+  
 
   return (
     <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-6 rounded-3xl shadow-xl border border-slate-800">
@@ -86,18 +86,18 @@ export const WorkerHeader: React.FC = () => {
                 EMERGENCY AVAILABILITY
               </span>
               <span className="text-[10px] text-slate-400 font-medium">
-                {emergencyOn ? 'Available for emergency dispatch' : 'Emergency dispatch OFF'}
+                {worker.isEmergencyReady ? 'Available for emergency dispatch' : 'Emergency dispatch OFF'}
               </span>
             </div>
             <button
-              onClick={() => setEmergencyOn(!emergencyOn)}
+              onClick={() => toggleEmergencyReady(worker.id)}
               className={`px-4 py-2 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center min-w-[80px] shadow-lg ${
-                emergencyOn
+                worker.isEmergencyReady
                   ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-950'
                   : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
               }`}
             >
-              {emergencyOn ? 'ON' : 'OFF'}
+              {worker.isEmergencyReady ? 'ON' : 'OFF'}
             </button>
           </div>
         </div>

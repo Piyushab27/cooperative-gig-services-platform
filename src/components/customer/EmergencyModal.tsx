@@ -66,7 +66,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
     setTimeout(() => {
       const matchCategories = selectedTypes.map(typeId => emergencyTypes.find(t => t.id === typeId)?.category).filter(Boolean);
       
-      const matched = workers.filter(w => w.isAvailable && matchCategories.includes(w.category));
+      const matched = workers.filter(w => w.isAvailable && w.isEmergencyReady && matchCategories.includes(w.category));
       let selectedWorkers = matched.slice(0, 2);
       
       if (selectedWorkers.length < 2) {

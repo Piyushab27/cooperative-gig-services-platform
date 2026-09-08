@@ -23,16 +23,28 @@ export const WorkerProfileEditor: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    updateWorkerProfile(activeWorkerId, {
-      name: formData.name,
-      categoryLabel: formData.categoryLabel,
-      languages: formData.languages.split(',').map((l: string) => l.trim()),
-      basePrice: Number(formData.basePrice),
-    });
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 3000);
+
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleSave = async () => {
+    setIsUpdating(true);
+    try {
+      await updateWorkerProfile(activeWorkerId, {
+        name: formData.name,
+        categoryLabel: formData.categoryLabel,
+        languages: formData.languages.split(',').map((l: string) => l.trim()),
+        basePrice: Number(formData.basePrice),
+        bio: formData.about,
+      });
+      setIsSaved(true);
+      setTimeout(() => setIsSaved(false), 3000);
+    } catch (e) {
+      alert("Failed to save profile. Please try again.");
+    } finally {
+      setIsUpdating(false);
+    }
   };
+
 
   return (
     <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-6">
@@ -129,7 +141,7 @@ export const WorkerProfileEditor: React.FC = () => {
 
           <div className="flex justify-end pt-2">
             <button 
-              onClick={handleSave}
+              onClick={handleSave} disabled={isUpdating}
               className="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-sm transition flex items-center gap-2"
             >
               {isSaved ? <><CheckCircle2 className="w-4 h-4" /> Saved!</> : 'Save Profile Changes'}

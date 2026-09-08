@@ -16,12 +16,23 @@ export const WorkerDashboard: React.FC = () => {
 
   const activeJob = bookings.find(b => b.id === activeBookingId && b.status !== 'completed' && b.status !== 'cancelled');
 
-  const handleAcceptJob = (bookingId: string) => {
-    updateBookingStatus(bookingId, 'accepted');
-    setActiveBookingId(bookingId);
+  
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleAcceptJob = async (bookingId: string) => {
+    try {
+      setIsUpdating(true);
+      await updateBookingStatus(bookingId, 'accepted');
+      setActiveBookingId(bookingId);
+    } catch (error) {
+      alert("Unable to accept booking. Please try again.");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
-  const handleAdvanceJobStatus = () => {
+  
+  const handleAdvanceJobStatus = async () => {
     if (!activeJob) return;
     const flow: Record<string, any> = {
       accepted: 'on_the_way',
@@ -30,7 +41,16 @@ export const WorkerDashboard: React.FC = () => {
       in_progress: 'completed',
     };
     const next = flow[activeJob.status];
-    if (next) updateBookingStatus(activeJob.id, next);
+    if (next) {
+      try {
+        setIsUpdating(true);
+        await updateBookingStatus(activeJob.id, next);
+      } catch (error) {
+        alert("Unable to update booking status. Please try again.");
+      } finally {
+        setIsUpdating(false);
+      }
+    }
   };
 
   return (
@@ -130,7 +150,8 @@ export const WorkerDashboard: React.FC = () => {
                 <div className="flex flex-col gap-2">
                   <button
                     onClick={handleAdvanceJobStatus}
-                    className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-xs shadow-lg shadow-emerald-950 flex items-center justify-between min-w-[200px] transition"
+                    disabled={isUpdating}
+                    className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-xs shadow-lg shadow-emerald-950 flex items-center justify-between min-w-[200px] transition disabled:opacity-50 disabled:cursor-wait"
                   >
                     <span>{activeJob.status === 'accepted' ? 'START NAVIGATION' : activeJob.status === 'on_the_way' ? 'MARK ARRIVED' : activeJob.status === 'arrived' ? 'START SERVICE' : 'MARK COMPLETED'}</span>
                     <ChevronRight className="w-4 h-4" />

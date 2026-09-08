@@ -14,9 +14,19 @@ export const WorkerRequests: React.FC<{ onAccept: (id: string) => void }> = ({ o
   const emergencyRequests = pendingBookings.filter(b => b.isEmergency);
   const normalRequests = pendingBookings.filter(b => !b.isEmergency);
 
-  const handleReject = (id: string) => {
-    updateBookingStatus(id, 'cancelled');
-    setRejectingId(null);
+  
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleReject = async (id: string) => {
+    try {
+      setIsUpdating(true);
+      await updateBookingStatus(id, 'cancelled');
+    } catch (error) {
+      alert("Unable to reject booking. Please try again.");
+    } finally {
+      setIsUpdating(false);
+      setRejectingId(null);
+    }
   };
 
   if (pendingBookings.length === 0) {
@@ -71,7 +81,7 @@ export const WorkerRequests: React.FC<{ onAccept: (id: string) => void }> = ({ o
             <button onClick={() => setRejectingId(null)} className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-200 transition">
               Cancel
             </button>
-            <button onClick={() => handleReject(booking.id)} className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 transition">
+            <button onClick={() => handleReject(booking.id)} disabled={isUpdating} className="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700 transition disabled:opacity-50">
               Confirm Reject
             </button>
           </div>

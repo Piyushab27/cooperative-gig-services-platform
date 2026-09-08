@@ -25,6 +25,7 @@ export interface Worker {
   experienceYears: number;
   distanceKm: number;
   isAvailable: boolean;
+  isEmergencyReady: boolean;
   basePrice: number;
   cooperativeName: string;
   cooperativeId: string;

@@ -72,11 +72,12 @@ interface DemoContextType {
     photoUrl?: string;
     isEmergency?: boolean;
     estimatedPrice?: number;
-  }) => Booking;
-  updateBookingStatus: (bookingId: string, status: BookingStatus) => void;
+  }) => Promise<Booking>;
+  updateBookingStatus: (bookingId: string, status: BookingStatus) => Promise<void>;
   submitRating: (bookingId: string, rating: number, comment: string, tags: string[]) => void;
-  updateWorkerProfile: (workerId: string, updates: Partial<Worker>) => void;
-  toggleAvailability: (workerId: string) => void;
+  updateWorkerProfile: (workerId: string, updates: Partial<Worker>) => Promise<void>;
+  toggleAvailability: (workerId: string) => Promise<void>;
+  toggleEmergencyReady: (workerId: string) => Promise<void>;
   approveWorker: (workerId: string) => void;
   rejectWorker: (workerId: string) => void;
   // Demo Launcher
@@ -217,30 +218,19 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
   };
 
-  const createBooking = (details: {
-    category: ServiceCategory;
-    worker: Worker;
-    scheduledDate: string;
-    scheduledTime: string;
-    address: string;
-    problem: string;
-    photoUrl?: string;
-    isEmergency?: boolean;
-    estimatedPrice?: number;
-  }): Booking => {
-    // This is a protected action, but it should have already been protected by the component calling it.
-    const price = details.estimatedPrice || details.worker.basePrice || 450;
+  const createBooking = async (details: any): Promise<Booking> => {
+    const price = details.estimatedPrice || details.worker?.basePrice || 450;
     const breakdown = calculateFairWage(price, wageConfig.workerPct, wageConfig.coopPct, wageConfig.welfarePct);
 
-    const newBooking: Booking = {
+    const newBooking = {
       id: `BK-2026-${Math.floor(1000 + Math.random() * 9000)}`,
       serviceCategory: details.category,
-      serviceTitle: `${details.worker.categoryLabel} Service`,
-      workerId: details.worker.id,
-      workerName: details.worker.name,
-      workerPhoto: details.worker.photo,
-      workerCooperative: details.worker.cooperativeName,
-      workerRating: details.worker.rating,
+      serviceTitle: `${details.worker?.categoryLabel || details.category} Service`,
+      workerId: details.worker?.id || 'w-1',
+      workerName: details.worker?.name || 'Worker',
+      workerPhoto: details.worker?.photo,
+      workerCooperative: details.worker?.cooperativeName || 'Cooperative',
+      workerRating: details.worker?.rating || 0,
       customerName: 'Priya Sharma',
       customerPhone: '+91 98765 43210',
       customerAddress: details.address || 'Flat 402, Green Valley Apartments, Banjara Hills, Hyderabad',
@@ -251,30 +241,29 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       problemDescription: details.problem,
       photoUrl: details.photoUrl,
       isEmergency: details.isEmergency || false,
-      status: 'requested',
+      status: 'requested' as BookingStatus,
       estimatedPrice: price,
       wageBreakdown: breakdown,
       createdAt: new Date().toISOString(),
     };
 
+    // Optimistic UI
     setBookings(prev => [newBooking, ...prev]);
     setActiveBookingId(newBooking.id);
 
-    // Add notification
-    const newNotif: NotificationItem = {
-      id: 'n-' + Date.now(),
-      title: 'Booking Confirmed!',
-      message: `${details.worker.name} matched with ${newBooking.id}. Status: Accepted`,
-      timestamp: 'Just now',
-      type: 'booking',
-      read: false,
-    };
-    setNotifications(prev => [newNotif, ...prev]);
+    try {
+      const { createSupabaseBooking } = await import('../services/supabaseService');
+      await createSupabaseBooking(newBooking);
+    } catch (err) {
+      console.error("Failed to create booking in Supabase", err);
+      // Revert optimistic if necessary
+    }
 
     return newBooking;
   };
 
-  const updateBookingStatus = (bookingId: string, status: BookingStatus) => {
+  const updateBookingStatus = async (bookingId: string, status: BookingStatus) => {
+    // Optimistic UI
     setBookings(prev => prev.map(b => {
       if (b.id === bookingId) {
         const finalPrice = b.finalPrice || b.estimatedPrice;
@@ -290,26 +279,13 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return b;
     }));
 
-    // Update notification
-    const notifMap: Record<BookingStatus, string> = {
-      requested: 'Booking requested',
-      accepted: 'Worker accepted job request',
-      on_the_way: 'Worker is on the way (ETA 8 mins)',
-      arrived: 'Worker has arrived at your location',
-      in_progress: 'Service work in progress',
-      completed: 'Service completed! Invoice generated.',
-      cancelled: 'Booking cancelled',
-    };
-
-    const newNotif: NotificationItem = {
-      id: 'n-' + Date.now(),
-      title: `Status: ${status.replace('_', ' ').toUpperCase()}`,
-      message: notifMap[status] || `Booking status updated to ${status}`,
-      timestamp: 'Just now',
-      type: status === 'completed' ? 'payment' : 'booking',
-      read: false,
-    };
-    setNotifications(prev => [newNotif, ...prev]);
+    try {
+      const { updateBookingStatus: updateSupabaseStatus } = await import('../services/supabaseService');
+      await updateSupabaseStatus(bookingId, status);
+    } catch (err) {
+      console.error("Failed to update status in Supabase", err);
+      throw err; // So UI can catch it
+    }
   };
 
   const submitRating = (bookingId: string, rating: number, comment: string, tags: string[]) => {
@@ -360,12 +336,77 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, verificationStatus: 'pending' } : w));
   };
 
-  const updateWorkerProfile = (workerId: string, updates: Partial<Worker>) => {
+  
+  const updateWorkerProfile = async (workerId: string, updates: Partial<Worker>) => {
+    // Optimistic UI
     setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, ...updates } : w));
+    
+    try {
+      const { supabase } = await import('../lib/supabase');
+      
+      const payload: any = {};
+      if (updates.name) payload.name = updates.name;
+      if (updates.categoryLabel) payload.category_label = updates.categoryLabel;
+      if (updates.basePrice) payload.base_price = updates.basePrice;
+      if (updates.bio) payload.bio = updates.bio;
+
+      if (Object.keys(payload).length > 0) {
+        const { error } = await supabase.from('workers').update(payload).eq('id', workerId);
+        if (error) throw error;
+      }
+      
+      // Handle languages
+      if (updates.languages) {
+        await supabase.from('worker_languages').delete().eq('worker_id', workerId);
+        if (updates.languages.length > 0) {
+          await supabase.from('worker_languages').insert(
+            updates.languages.map(l => ({ worker_id: workerId, language: l }))
+          );
+        }
+      }
+      
+    } catch (err) {
+      console.error("Failed to update profile", err);
+      // Let UI handle failure if needed
+    }
   };
 
-  const toggleAvailability = (workerId: string) => {
-    setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, isAvailable: !w.isAvailable } : w));
+  const toggleAvailability = async (workerId: string) => {
+    const worker = workers.find(w => w.id === workerId);
+    if (!worker) return;
+    const newStatus = !worker.isAvailable;
+    
+    // Optimistic
+    setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, isAvailable: newStatus } : w));
+    
+    try {
+      const { updateWorkerAvailability } = await import('../services/supabaseService');
+      await updateWorkerAvailability(workerId, newStatus);
+    } catch (err) {
+      console.error("Failed to update availability", err);
+      // revert
+      setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, isAvailable: !newStatus } : w));
+      throw err;
+    }
+  };
+
+  const toggleEmergencyReady = async (workerId: string) => {
+    const worker = workers.find(w => w.id === workerId);
+    if (!worker) return;
+    const newStatus = !worker.isEmergencyReady;
+    
+    // Optimistic
+    setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, isEmergencyReady: newStatus } : w));
+    
+    try {
+      const { updateWorkerEmergencyReady } = await import('../services/supabaseService');
+      await updateWorkerEmergencyReady(workerId, newStatus);
+    } catch (err) {
+      console.error("Failed to update emergency readiness", err);
+      // revert
+      setWorkers(prev => prev.map(w => w.id === workerId ? { ...w, isEmergencyReady: !newStatus } : w));
+      throw err;
+    }
   };
 
   const markMessagesRead = (bookingId: string, userId: string) => {
@@ -421,6 +462,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         submitRating,
         updateWorkerProfile,
         toggleAvailability,
+        toggleEmergencyReady,
         approveWorker,
         rejectWorker,
         triggerDemoJourney,
