@@ -49,16 +49,16 @@ export const Navbar: React.FC = () => {
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
       <div className="w-[92%] max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap lg:flex-nowrap items-center justify-between py-2 lg:h-16 gap-2 lg:gap-4">
+        <div className="flex justify-between items-center w-full whitespace-nowrap py-2 h-16 gap-1 md:gap-2 lg:gap-3">
           
           {/* Sahakaar Brand Logo */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 lg:gap-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-800 flex items-center justify-center text-white shadow-md shadow-emerald-600/30">
               <Handshake className="w-6 h-6 stroke-[2.2]" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-xl tracking-tight text-slate-900">
+                <span className="font-extrabold text-lg lg:text-xl tracking-tight text-slate-900">
                   Sahakaar<span className="text-emerald-600">.</span>
                 </span>
                 <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-md uppercase tracking-wider">
@@ -76,7 +76,7 @@ export const Navbar: React.FC = () => {
             <div className="relative hidden md:block">
               <button
                 onClick={() => setShowLocationMenu(!showLocationMenu)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-xs font-semibold text-slate-700 transition border border-slate-200/60"
+                className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-[11px] lg:text-xs font-semibold text-slate-700 transition border border-slate-200/60"
               >
                 <MapPin className="w-4 h-4 text-emerald-600" />
                 <span>{location}</span>
@@ -111,13 +111,13 @@ export const Navbar: React.FC = () => {
           <div className="flex-1"></div>
 
           {/* Right Actions: Language + Notifications + Avatar */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 lg:gap-2">
             
             {/* 1-Tap Emergency Button (Customer Only) */}
             {role === 'customer' && (
               <button
                 onClick={() => setEmergencyModalOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-extrabold transition-all shadow-sm mr-2"
+                className="flex items-center gap-1 px-2 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[11px] lg:text-xs font-extrabold transition-all shadow-sm mr-1 lg:mr-2"
               >
                 <span className="text-sm">🚨</span>
                 <span className="hidden sm:inline">1-Tap Emergency</span>
@@ -125,12 +125,12 @@ export const Navbar: React.FC = () => {
             )}
 
             {/* 5 Roles Selector */}
-            <div className="flex flex-wrap items-center gap-1 sm:gap-2 mr-2">
+            <div className="flex items-center gap-1 mx-1 lg:mx-2">
               {(['customer', 'worker', 'cooperative_admin', 'federation_admin', 'super_admin'] as Role[]).map((r) => (
                 <button
                   key={r}
                   onClick={() => triggerDemoJourney(r)}
-                  className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold transition-all border ${
+                  className={`px-2 py-1 lg:py-1.5 rounded-lg text-[10px] lg:text-xs font-bold transition-all border ${
                     role === r
                       ? 'bg-emerald-600 text-white border-emerald-600 shadow-md'
                       : 'bg-white text-slate-600 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50'
@@ -146,7 +146,7 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* User Profile Avatar */}
-            <div className="pl-2 border-l border-slate-200 flex items-center gap-2 relative">
+            <div className="pl-1 lg:pl-2 border-l border-slate-200 flex items-center gap-1 lg:gap-2 relative shrink-0">
               {/* Profile Dropdown (Unconditional for Demo) */}
               <>
                 <button
@@ -170,7 +170,7 @@ export const Navbar: React.FC = () => {
                       <ShieldCheck className="w-5 h-5 text-emerald-700" />
                     )}
                   </div>
-                  <div className="hidden lg:block mr-2">
+                  <div className="hidden xl:block mr-1">
                     <div className="text-xs font-bold text-slate-900 leading-tight">
                       {user?.user_metadata?.full_name || "Demo User"}
                     </div>
