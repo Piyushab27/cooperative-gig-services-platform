@@ -158,35 +158,30 @@ Worker Welfare & Insurance Fund (5%): ₹${welfareFund}
         </div>
 
         {/* Modal Action CTA */}
-        <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-4">
+        <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <span className="text-[10px] font-bold text-slate-400 uppercase block">Total Due</span>
             <span className="text-xl font-extrabold text-slate-900">₹{totalAmount}</span>
           </div>
 
-          <div className="flex gap-2">
-            {booking.status === 'completed' && (
-              <button
-                onClick={handleDownload}
-                className="px-4 py-3 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-extrabold text-sm transition shadow-sm flex items-center gap-2"
-              >
-                <span>↓ Download Invoice</span>
-              </button>
-            )}
-            
-            {booking.status !== 'completed' && (
-              <button
-                onClick={() => onProceedToPayment(totalAmount)}
-                className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm transition shadow-xl shadow-emerald-600/30 flex items-center gap-2"
-              >
-                <span>PROCEED TO DIGITAL PAYMENT</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button
+              onClick={handleDownload}
+              className="flex-1 sm:flex-none px-4 py-3 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-extrabold text-sm transition shadow-sm flex items-center justify-center gap-2"
+            >
+              <span>↓ Download Invoice</span>
+            </button>
+
+            <button
+              onClick={() => onProceedToPayment(totalAmount)}
+              className="flex-1 sm:flex-none px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm transition shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-2"
+            >
+              <span>PROCEED TO PAYMENT →</span>
+            </button>
           </div>
         </div>
-
       </div>
     </div>
   );
 };
+

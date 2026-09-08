@@ -83,8 +83,7 @@ export const BookingTracker: React.FC<BookingTrackerProps> = ({
               className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-emerald-400 font-bold text-xs border border-slate-700 flex items-center gap-1.5 transition"
               title="Simulate status progression for demo"
             >
-              <span>Simulate Next Step</span>
-              <ChevronRight className="w-4 h-4" />
+              <span>Next Step →</span>
             </button>
           )}
         </div>
@@ -142,10 +141,32 @@ export const BookingTracker: React.FC<BookingTrackerProps> = ({
           workerName={booking.workerName}
           workerPhoto={booking.workerPhoto}
           workerCategory={booking.serviceCategory}
-          distanceKm={2.1}
-          etaMinutes={booking.status === 'on_the_way' ? 8 : booking.status === 'arrived' ? 0 : 5}
+          distanceKm={booking.status === 'on_the_way' ? 1.2 : booking.status === 'arrived' || booking.status === 'in_progress' || booking.status === 'completed' ? 0 : 2.5}
+          etaMinutes={booking.status === 'on_the_way' ? 8 : booking.status === 'arrived' || booking.status === 'in_progress' || booking.status === 'completed' ? 0 : 15}
           statusText={`Status: ${booking.status.replace('_', ' ').toUpperCase()}`}
           heightClass="h-72"
+          customerLatLng={[17.4156, 78.4396]}
+          workers={[
+            {
+              id: booking.workerId || 'w-1',
+              name: booking.workerName,
+              photo: booking.workerPhoto,
+              category: booking.serviceCategory || 'Worker',
+              latLng: [
+                17.4156 + (booking.status === 'requested' || booking.status === 'accepted' ? 0.015 : booking.status === 'on_the_way' ? 0.005 : 0),
+                78.4396 + (booking.status === 'requested' || booking.status === 'accepted' ? 0.015 : booking.status === 'on_the_way' ? 0.005 : 0)
+              ],
+              isMain: true
+            },
+            {
+              id: 'w-context',
+              name: 'Vikram Singh',
+              photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
+              category: 'Plumber',
+              latLng: [17.4156 - 0.012, 78.4396 + 0.021],
+              isMain: false
+            }
+          ]}
         />
       </div>
 

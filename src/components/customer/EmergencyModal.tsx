@@ -19,13 +19,13 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
   const { workers } = useDemo();
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [foundWorker, setFoundWorker] = useState<Worker | null>(null);
+  const [foundWorkers, setFoundWorkers] = useState<Worker[]>([]);
 
   React.useEffect(() => {
     if (!isOpen) {
       setSelectedTypes([]);
       setIsSearching(false);
-      setFoundWorker(null);
+      setFoundWorkers([]);
     }
   }, [isOpen]);
 
@@ -48,14 +48,33 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
   const handleStartSearch = () => {
     if (selectedTypes.length === 0) return;
     setIsSearching(true);
-    setFoundWorker(null);
+    setFoundWorkers([]);
+
+    // Ask for location permission before dispatching
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          // Success (handled implicitly in tracking)
+        },
+        () => {
+          // Denied (fallback used)
+        }
+      );
+    }
 
     setTimeout(() => {
-      // Pick best matching available worker for the first selected emergency
-      const firstSelected = selectedTypes[0];
-      const matchedCategory = emergencyTypes.find(t => t.id === firstSelected)?.category || 'electrician';
-      const worker = workers.find(w => w.category === matchedCategory && w.isAvailable) || workers[0];
-      setFoundWorker(worker);
+      const matchCategories = selectedTypes.map(typeId => emergencyTypes.find(t => t.id === typeId)?.category).filter(Boolean);
+      
+      const matched = workers.filter(w => w.isAvailable && matchCategories.includes(w.category));
+      let selectedWorkers = matched.slice(0, 2);
+      
+      if (selectedWorkers.length < 2) {
+        // Fallback to random available workers if not enough exact matches
+        const others = workers.filter(w => w.isAvailable && !selectedWorkers.includes(w));
+        selectedWorkers = [...selectedWorkers, ...others].slice(0, 2);
+      }
+      
+      setFoundWorkers(selectedWorkers);
       setIsSearching(false);
     }, 2000);
   };
@@ -93,7 +112,7 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
           </div>
         </div>
 
-        {!foundWorker && !isSearching && (
+        {!foundWorkers.length && !isSearching && (
           <div className="space-y-4">
             <p className="text-xs text-slate-300">
               Select one or multiple emergency issues. We will dispatch the nearest verified cooperative worker within 8–10 minutes.
@@ -184,63 +203,61 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
           </div>
         )}
 
-        {/* Worker Found Confirmation */}
-        {foundWorker && (
-          <div className="space-y-4 animate-in fade-in">
+        {/* Worker Results */}
+        {foundWorkers.length > 0 && (
+          <div className="space-y-4 animate-in fade-in max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
             <div className="bg-emerald-950/80 border border-emerald-500/60 p-4 rounded-2xl flex items-center justify-between">
               <div>
                 <span className="text-emerald-400 text-xs font-bold uppercase tracking-wider">
-                  ✓ Perfect Emergency Match Found
+                  ✓ Emergency Dispatch
                 </span>
-                <h4 className="text-lg font-bold text-white mt-0.5">Worker Ready for Instant Dispatch</h4>
-              </div>
-              <span className="bg-emerald-500 text-white font-extrabold text-xs px-3 py-1 rounded-full animate-pulse">
-                ETA: 8 Mins
-              </span>
-            </div>
-
-            {/* Worker Details Card */}
-            <div className="bg-slate-800/90 p-4 rounded-2xl border border-slate-700 flex items-center gap-4">
-              <img
-                src={foundWorker.photo}
-                alt={foundWorker.name}
-                className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-400 shrink-0"
-              />
-              <div className="flex-1">
-                <h5 className="font-extrabold text-base text-white">{foundWorker.name}</h5>
-                <div className="mt-1">
-                  <VerifiedBadge cooperativeName={foundWorker.cooperativeName} size="sm" />
-                </div>
-                <div className="flex items-center gap-3 text-xs text-slate-300 mt-2 font-medium">
-                  <span>⭐ {foundWorker.rating} ({foundWorker.jobsCompleted} jobs)</span>
-                  <span>•</span>
-                  <span>📍 {foundWorker.distanceKm} km away</span>
-                  <span>•</span>
-                  <span className="text-emerald-400 font-bold">🟢 Available</span>
-                </div>
+                <h4 className="text-lg font-bold text-white mt-0.5">{foundWorkers.length} nearby verified cooperative workers found</h4>
               </div>
             </div>
 
-            {/* Interactive Map Preview */}
-            <InteractiveMap
-              customerLocationName="Banjara Hills"
-              workerName={foundWorker.name}
-              workerPhoto={foundWorker.photo}
-              workerCategory={foundWorker.categoryLabel}
-              distanceKm={foundWorker.distanceKm}
-              etaMinutes={8}
-              statusText="Nearest Emergency Dispatch"
-              heightClass="h-44"
-              isRadarMode={true}
-            />
-
-            <button
-              onClick={() => onConfirmEmergency(foundWorker)}
-              className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-base shadow-xl shadow-emerald-900/50 transition flex items-center justify-center gap-2"
-            >
-              <ShieldCheck className="w-5 h-5" />
-              <span>CONFIRM & DISPATCH EMERGENCY WORKER</span>
-            </button>
+            <div className="space-y-3">
+              {foundWorkers.map((worker, idx) => (
+                <div key={worker.id} className="bg-slate-800/90 p-4 rounded-2xl border border-slate-700 flex flex-col sm:flex-row sm:items-center gap-4">
+                  <img
+                    src={worker.photo}
+                    alt={worker.name}
+                    className="w-16 h-16 rounded-2xl object-cover border-2 border-slate-600 shrink-0"
+                  />
+                  <div className="flex-1">
+                    <h5 className="font-extrabold text-base text-white">{worker.name}</h5>
+                    <p className="text-xs text-slate-400 font-medium">{worker.categoryLabel}</p>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-slate-300 font-medium">
+                      <span>⭐ {worker.rating}</span>
+                      <span>•</span>
+                      <span>📍 {worker.distanceKm} km away</span>
+                      <span>•</span>
+                      <span className="text-emerald-400 font-bold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        ETA: {Math.floor(worker.distanceKm * 4)} min
+                      </span>
+                    </div>
+                    <div className="mt-2">
+                      <VerifiedBadge cooperativeName={worker.cooperativeName} size="sm" />
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col gap-2 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
+                    <button
+                      className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-slate-700 hover:bg-slate-600 transition"
+                    >
+                      View Profile
+                    </button>
+                    <button
+                      onClick={() => onConfirmEmergency(worker)}
+                      className="px-4 py-2 rounded-xl text-xs font-extrabold text-white bg-emerald-600 hover:bg-emerald-500 transition shadow-md flex items-center justify-center gap-1"
+                    >
+                      <span>Select Worker</span>
+                      <ShieldCheck className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
