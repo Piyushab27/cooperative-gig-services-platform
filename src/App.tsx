@@ -1,6 +1,8 @@
 import React from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { DemoProvider, useDemo } from './context/DemoContext';
-import { DemoBanner } from './components/common/DemoBanner';
+import { Login } from './components/auth/Login';
+import { SignUp } from './components/auth/SignUp';
 import { Navbar } from './components/common/Navbar';
 import { CustomerView } from './components/customer/CustomerView';
 import { WorkerDashboard } from './components/worker/WorkerDashboard';
@@ -8,21 +10,35 @@ import { AdminDashboard } from './components/admin/AdminDashboard';
 import { Handshake, Heart, ShieldCheck, Sparkles } from 'lucide-react';
 
 const MainApp: React.FC = () => {
-  const { role } = useDemo();
+  const { role: demoRole } = useDemo();
+  const { role: authRole, showLogin, authView, loading, user } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+      </div>
+    );
+  }
+
+  if (showLogin) {
+    return authView === 'signup' ? <SignUp /> : <Login />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans selection:bg-emerald-500 selection:text-white">
-      {/* Demo Quick Banner for Hackathon Judges */}
-      <DemoBanner />
 
       {/* Main Navbar */}
       <Navbar />
 
       {/* Dynamic Role View */}
       <main className="flex-1">
-        {role === 'customer' && <CustomerView />}
-        {role === 'worker' && <WorkerDashboard />}
-        {role === 'admin' && <AdminDashboard />}
+        {/* Customer view is public/landing, restricted actions inside it trigger login */}
+        {demoRole === 'customer' && <CustomerView />}
+        
+        {/* Dashboards strictly require authenticated role */}
+        {authRole === 'worker' && user && <WorkerDashboard />}
+        {authRole === 'admin' && user && <AdminDashboard />}
       </main>
 
       {/* Footer */}
@@ -72,9 +88,11 @@ const MainApp: React.FC = () => {
 
 export function App() {
   return (
-    <DemoProvider>
-      <MainApp />
-    </DemoProvider>
+    <AuthProvider>
+      <DemoProvider>
+        <MainApp />
+      </DemoProvider>
+    </AuthProvider>
   );
 }
 

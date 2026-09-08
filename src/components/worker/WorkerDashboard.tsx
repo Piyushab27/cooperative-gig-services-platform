@@ -21,7 +21,7 @@ export const WorkerDashboard: React.FC = () => {
   const { bookings, updateBookingStatus, activeBookingId, setActiveBookingId } = useDemo();
   const [activeTab, setActiveTab] = useState<'jobs' | 'earnings' | 'welfare' | 'verification'>('jobs');
 
-  const activeJob = bookings.find(b => b.id === activeBookingId && b.status !== 'completed');
+  const activeJob = bookings.find(b => b.id === activeBookingId);
 
   const handleAcceptJob = (bookingId: string) => {
     updateBookingStatus(bookingId, 'accepted');
@@ -67,10 +67,11 @@ export const WorkerDashboard: React.FC = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={handleAdvanceJobStatus}
-              className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-xs shadow-lg shadow-emerald-950 flex items-center gap-1.5 transition"
+              disabled={activeJob.status === 'completed'}
+              className={`px-5 py-2.5 rounded-2xl ${activeJob.status === 'completed' ? 'bg-slate-600 cursor-not-allowed opacity-80' : 'bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-950'} text-white font-extrabold text-xs flex items-center gap-1.5 transition`}
             >
-              <span>ADVANCE JOB STEP ({activeJob.status === 'accepted' ? 'On The Way' : activeJob.status === 'on_the_way' ? 'Mark Arrived' : activeJob.status === 'arrived' ? 'Start Service' : 'Finish Job'})</span>
-              <ChevronRight className="w-4 h-4" />
+              <span>{activeJob.status === 'completed' ? 'JOB COMPLETED' : `ADVANCE JOB STEP (${activeJob.status === 'accepted' ? 'On The Way' : activeJob.status === 'on_the_way' ? 'Mark Arrived' : activeJob.status === 'arrived' ? 'Start Service' : 'Finish Job'})`}</span>
+              {activeJob.status !== 'completed' && <ChevronRight className="w-4 h-4" />}
             </button>
           </div>
         </div>

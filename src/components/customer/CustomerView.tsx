@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
+import { useAuth } from '../../context/AuthContext';
 import { rankWorkersByAI } from '../../utils/aiMatcher';
 import { WorkerWithScore } from '../../types';
 import { LandingHero } from './LandingHero';
@@ -25,6 +26,7 @@ export const CustomerView: React.FC = () => {
     activeBookingId,
     setActiveBookingId
   } = useDemo();
+  const { requireAuth } = useAuth();
 
   const [activeCustomerSubTab, setActiveCustomerSubTab] = useState<'browse' | 'tracker' | 'dashboard'>('browse');
 
@@ -44,8 +46,10 @@ export const CustomerView: React.FC = () => {
   const bestWorker = rankedWorkers[0];
 
   const handleStartBooking = (worker: WorkerWithScore) => {
-    setBookingWizardWorker(worker);
-    setIsBookingWizardOpen(true);
+    requireAuth(() => {
+      setBookingWizardWorker(worker);
+      setIsBookingWizardOpen(true);
+    });
   };
 
   const handleBookingConfirmed = (details: any) => {
@@ -126,7 +130,7 @@ export const CustomerView: React.FC = () => {
           </div>
 
           <button
-            onClick={() => setIsEmergencyOpen(true)}
+            onClick={() => requireAuth(() => setIsEmergencyOpen(true))}
             className="text-red-600 font-extrabold flex items-center gap-1 hover:underline text-[11px]"
           >
             <span>🚨 1-Tap Emergency</span>
@@ -138,7 +142,7 @@ export const CustomerView: React.FC = () => {
         <div className="space-y-8">
           
           {/* Landing Hero */}
-          <LandingHero onOpenEmergency={() => setIsEmergencyOpen(true)} />
+          <LandingHero onOpenEmergency={() => requireAuth(() => setIsEmergencyOpen(true))} />
 
           {/* Service Categories Grid */}
           <ServiceCategories />

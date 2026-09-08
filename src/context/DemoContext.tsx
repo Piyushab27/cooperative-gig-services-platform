@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 import {
   Role,
   Language,
@@ -22,7 +23,6 @@ interface WageConfig {
 
 interface DemoContextType {
   role: Role;
-  setRole: (role: Role) => void;
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
@@ -58,7 +58,6 @@ interface DemoContextType {
   }) => Booking;
   updateBookingStatus: (bookingId: string, status: BookingStatus) => void;
   submitRating: (bookingId: string, rating: number, comment: string, tags: string[]) => void;
-  // Worker verification
   approveWorker: (workerId: string) => void;
   rejectWorker: (workerId: string) => void;
   // Demo Launcher
@@ -124,7 +123,9 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
 ];
 
 export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [role, setRole] = useState<Role>('customer');
+  const { role: authRole, requireAuth } = useAuth();
+  const role: Role = authRole || 'customer';
+  
   const [language, setLanguage] = useState<Language>('en');
   const [location, setLocation] = useState<string>('Hyderabad (Banjara Hills)');
   const [workers, setWorkers] = useState<Worker[]>(MOCK_WORKERS);
@@ -176,6 +177,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isEmergency?: boolean;
     estimatedPrice?: number;
   }): Booking => {
+    // This is a protected action, but it should have already been protected by the component calling it.
     const price = details.estimatedPrice || details.worker.basePrice || 450;
     const breakdown = calculateFairWage(price, wageConfig.workerPct, wageConfig.coopPct, wageConfig.welfarePct);
 
@@ -308,21 +310,13 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const triggerDemoJourney = (targetRole: Role) => {
-    setRole(targetRole);
-    if (targetRole === 'customer') {
-      setActiveBookingId('BK-2026-9041');
-      setSelectedCategory('electrician');
-    } else if (targetRole === 'worker') {
-      setActiveWorkerId('w-1'); // Ravi Kumar
-      setActiveBookingId('BK-2026-9041');
-    }
+    console.log(`Demo Journey triggered for ${targetRole} - Action disabled due to Real Auth.`);
   };
 
   return (
     <DemoContext.Provider
       value={{
         role,
-        setRole,
         language,
         setLanguage,
         t,

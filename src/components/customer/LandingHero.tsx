@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDemo } from '../../context/DemoContext';
-import { Search, MapPin, AlertTriangle, ShieldCheck, Sparkles, HeartHandshake, CheckCircle } from 'lucide-react';
+import { Search, MapPin, AlertTriangle, ShieldCheck, Sparkles, HeartHandshake, CheckCircle, LocateFixed } from 'lucide-react';
 
 interface LandingHeroProps {
   onOpenEmergency: () => void;
@@ -40,9 +40,14 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenEmergency }) => 
           <div className="bg-white p-2 rounded-2xl shadow-2xl border border-emerald-500/20 flex flex-col sm:flex-row items-center gap-2">
             
             {/* Location Pill */}
-            <div className="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-xl text-slate-700 font-bold text-xs shrink-0 w-full sm:w-auto">
-              <MapPin className="w-4 h-4 text-emerald-600" />
-              <span>📍 {location}</span>
+            <div className="flex items-center justify-between px-3 py-2 bg-slate-100 rounded-xl text-slate-700 font-bold text-xs shrink-0 w-full sm:w-auto">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-emerald-600" />
+                <span>📍 {location}</span>
+              </div>
+              <button title="Get Current Location" className="ml-3 p-1 rounded-md text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition">
+                <LocateFixed className="w-4 h-4" />
+              </button>
             </div>
 
             {/* Input Search */}
@@ -56,12 +61,6 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onOpenEmergency }) => 
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-transparent text-slate-900 placeholder:text-slate-400 text-sm font-medium focus:outline-none"
               />
             </div>
-
-            {/* AI Search CTA button */}
-            <button className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 shrink-0">
-              <Sparkles className="w-4 h-4" />
-              <span>AI Search</span>
-            </button>
           </div>
         </div>
 

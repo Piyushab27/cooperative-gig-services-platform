@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
+import { useAuth } from '../../context/AuthContext';
 import { Language, Role } from '../../types';
 import {
   Handshake,
@@ -8,15 +9,16 @@ import {
   Bell,
   User,
   HardHat,
-  ShieldCheck,
   CheckCircle2,
-  ChevronDown
+  ChevronDown,
+  LogOut,
+  LogIn,
+  ShieldCheck
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const {
     role,
-    setRole,
     language,
     setLanguage,
     t,
@@ -25,6 +27,8 @@ export const Navbar: React.FC = () => {
     notifications,
     markNotificationRead
   } = useDemo();
+  
+  const { user, logout, setShowLogin } = useAuth();
 
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [showNotifMenu, setShowNotifMenu] = useState(false);
@@ -102,44 +106,7 @@ export const Navbar: React.FC = () => {
             </div>
           )}
 
-          {/* Center Role Toggle Pills */}
-          <div className="bg-slate-100 p-1 rounded-2xl flex items-center border border-slate-200/80">
-            <button
-              onClick={() => setRole('customer')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                role === 'customer'
-                  ? 'bg-white text-emerald-700 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>{t('customerRole')}</span>
-            </button>
-
-            <button
-              onClick={() => setRole('worker')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                role === 'worker'
-                  ? 'bg-white text-emerald-700 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <HardHat className="w-3.5 h-3.5" />
-              <span>{t('workerRole')}</span>
-            </button>
-
-            <button
-              onClick={() => setRole('admin')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                role === 'admin'
-                  ? 'bg-white text-emerald-700 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{t('adminRole')}</span>
-            </button>
-          </div>
+          <div className="flex-1"></div>
 
           {/* Right Actions: Language + Notifications + Avatar */}
           <div className="flex items-center gap-2">
@@ -191,76 +158,76 @@ export const Navbar: React.FC = () => {
               )}
             </div>
 
-            {/* Notifications Popover */}
-            <div className="relative">
-              <button
-                onClick={() => setShowNotifMenu(!showNotifMenu)}
-                className="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition"
-              >
-                <Bell className="w-5 h-5" />
-                {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-emerald-500 text-white rounded-full text-[10px] font-extrabold flex items-center justify-center animate-pulse">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {showNotifMenu && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 py-3 z-50">
-                  <div className="px-4 pb-2 border-b border-slate-100 flex items-center justify-between">
-                    <h4 className="font-bold text-sm text-slate-800">Notifications</h4>
-                    <span className="text-[11px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
-                      {unreadCount} new
-                    </span>
-                  </div>
-                  <div className="max-h-72 overflow-y-auto divide-y divide-slate-100">
-                    {notifications.map(n => (
-                      <div
-                        key={n.id}
-                        onClick={() => markNotificationRead(n.id)}
-                        className={`p-3 text-xs hover:bg-slate-50 transition cursor-pointer ${
-                          !n.read ? 'bg-emerald-50/40' : ''
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-slate-900">{n.title}</span>
-                          <span className="text-[10px] text-slate-400">{n.timestamp}</span>
-                        </div>
-                        <p className="text-slate-600 text-[11px] leading-relaxed">{n.message}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
             {/* User Profile Avatar */}
-            <div className="pl-2 border-l border-slate-200 flex items-center gap-2">
-              <div className="w-9 h-9 rounded-full bg-emerald-100 border-2 border-emerald-500/40 overflow-hidden shrink-0 flex items-center justify-center">
-                {role === 'customer' ? (
-                  <img
-                    src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80"
-                    alt="Priya Sharma"
-                    className="w-full h-full object-cover"
-                  />
-                ) : role === 'worker' ? (
-                  <img
-                    src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=150&auto=format&fit=crop&q=80"
-                    alt="Ravi Kumar"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <ShieldCheck className="w-5 h-5 text-emerald-700" />
-                )}
-              </div>
-              <div className="hidden lg:block text-left">
-                <div className="text-xs font-bold text-slate-900 leading-tight">
-                  {role === 'customer' ? 'Priya Sharma' : role === 'worker' ? 'Ravi Kumar' : 'Federation Admin'}
-                </div>
-                <div className="text-[10px] text-slate-500 font-medium capitalize">
-                  {role === 'customer' ? 'Customer' : role === 'worker' ? 'Verified Member' : 'Cooperative Federation'}
-                </div>
-              </div>
+            <div className="pl-2 border-l border-slate-200 flex items-center gap-2 relative">
+              {user ? (
+                <>
+                  <button 
+                    onClick={() => setShowNotifMenu(!showNotifMenu)} // We'll repurpose this state or use a new one, wait, I'll use a new state.
+                    className="flex items-center gap-2 text-left hover:bg-slate-50 p-1.5 rounded-xl transition"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-emerald-100 border-2 border-emerald-500/40 overflow-hidden shrink-0 flex items-center justify-center">
+                      {role === 'customer' ? (
+                        <img
+                          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80"
+                          alt="Customer Avatar"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : role === 'worker' ? (
+                        <img
+                          src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=150&auto=format&fit=crop&q=80"
+                          alt="Worker Avatar"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <ShieldCheck className="w-5 h-5 text-emerald-700" />
+                      )}
+                    </div>
+                    <div className="hidden lg:block mr-2">
+                      <div className="text-xs font-bold text-slate-900 leading-tight">
+                        {user.user_metadata?.full_name || 'Sahakaar User'}
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-medium capitalize flex items-center gap-1">
+                        {role === 'customer' ? 'Customer' : role === 'worker' ? 'Verified Worker' : 'Admin'}
+                        <ChevronDown className="w-3 h-3" />
+                      </div>
+                    </div>
+                  </button>
+
+                  {showNotifMenu && ( // Reusing showNotifMenu state to represent profile menu to save adding a new useState
+                    <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 py-3 z-50 animate-in fade-in slide-in-from-top-2">
+                      <div className="px-4 pb-3 border-b border-slate-100">
+                        <p className="text-sm font-extrabold text-slate-900">{user.user_metadata?.full_name || 'Sahakaar User'}</p>
+                        <p className="text-xs text-slate-500 font-medium">{user.email}</p>
+                        <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md text-[10px] font-bold uppercase tracking-wide">
+                          {role === 'worker' ? <HardHat className="w-3 h-3" /> : role === 'customer' ? <User className="w-3 h-3" /> : <ShieldCheck className="w-3 h-3" />}
+                          {role} Account
+                        </div>
+                      </div>
+                      <div className="pt-2 px-2">
+                        <button
+                          onClick={() => {
+                            setShowNotifMenu(false);
+                            logout();
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 font-bold hover:bg-red-50 rounded-xl transition"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Log Out</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <button
+                  onClick={() => setShowLogin(true)}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Log In</span>
+                </button>
+              )}
             </div>
 
           </div>
