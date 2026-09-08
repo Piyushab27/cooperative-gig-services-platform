@@ -21,6 +21,14 @@ export const EmergencyModal: React.FC<EmergencyModalProps> = ({
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [foundWorker, setFoundWorker] = useState<Worker | null>(null);
 
+  React.useEffect(() => {
+    if (!isOpen) {
+      setSelectedTypes([]);
+      setIsSearching(false);
+      setFoundWorker(null);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const emergencyTypes = [
