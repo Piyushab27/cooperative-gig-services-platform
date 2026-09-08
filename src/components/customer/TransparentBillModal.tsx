@@ -166,17 +166,16 @@ Worker Welfare & Insurance Fund (5%): ₹${welfareFund}
 
           <div className="flex gap-2 w-full sm:w-auto">
             <button
-              onClick={handleDownload}
+              onClick={onClose}
               className="flex-1 sm:flex-none px-4 py-3 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-extrabold text-sm transition shadow-sm flex items-center justify-center gap-2"
             >
-              <span>↓ Download Invoice</span>
+              <span>Close</span>
             </button>
-
             <button
-              onClick={() => onProceedToPayment(totalAmount)}
-              className="flex-1 sm:flex-none px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm transition shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-2"
+              onClick={handleDownload}
+              className="flex-1 sm:flex-none px-4 py-3 rounded-2xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-extrabold text-sm transition shadow-sm flex items-center justify-center gap-2"
             >
-              <span>PROCEED TO PAYMENT →</span>
+              <span>↓ Download Invoice</span>
             </button>
           </div>
         </div>

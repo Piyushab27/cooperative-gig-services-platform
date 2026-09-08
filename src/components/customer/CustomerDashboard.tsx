@@ -4,6 +4,7 @@ import { BookingStatus } from '../../types';
 import { VerifiedBadge } from '../common/VerifiedBadge';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { EmptyState } from '../common/EmptyState';
+import { DisputeModal } from './DisputeModal';
 import {
   Calendar,
   Clock,
@@ -28,6 +29,9 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
   onViewBill,
 }) => {
   const { bookings, location, isLoading } = useDemo();
+  const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [newDispute, setNewDispute] = useState<any>(null);
+  const [disputeSuccessMessage, setDisputeSuccessMessage] = useState("");
   const [activeTab, setActiveTab] = useState<'bookings' | 'addresses' | 'payments' | 'invoices'>('bookings');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('all');
 
@@ -301,12 +305,39 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
         <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-extrabold text-base text-slate-900">Support & Disputes</h3>
-            <button className="px-4 py-2 bg-rose-50 text-rose-700 text-xs font-bold rounded-xl hover:bg-rose-100 transition">
+            <button 
+              onClick={() => setIsDisputeModalOpen(true)}
+              className="px-4 py-2 bg-rose-50 text-rose-700 text-xs font-bold rounded-xl hover:bg-rose-100 transition"
+            >
               Raise New Dispute
             </button>
           </div>
           
           <div className="space-y-4">
+            {disputeSuccessMessage && (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold rounded-xl flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" />
+                {disputeSuccessMessage}
+              </div>
+            )}
+
+            {newDispute && (
+              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 animate-in fade-in">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-bold text-sm text-slate-900">{newDispute.category} ({newDispute.bookingId})</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 uppercase">
+                    {newDispute.status}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 mb-3">{newDispute.description}</p>
+                <div className="flex items-center gap-2 text-[10px] font-semibold text-slate-500">
+                  <span>Raised: {newDispute.date}</span>
+                  <span>•</span>
+                  <span>Assigned to: Cooperative Grievance Team</span>
+                </div>
+              </div>
+            )}
+
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-bold text-sm text-slate-900">Overcharging Complaint (BK-2026-8812)</span>
@@ -327,6 +358,16 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
         </div>
       )}
 
+      <DisputeModal
+        isOpen={isDisputeModalOpen}
+        onClose={() => setIsDisputeModalOpen(false)}
+        onSubmit={(dispute: any) => {
+          setNewDispute(dispute);
+          setIsDisputeModalOpen(false);
+          setDisputeSuccessMessage("Your dispute has been registered and will be reviewed by the cooperative grievance team.");
+          setTimeout(() => setDisputeSuccessMessage(""), 5000);
+        }}
+      />
     </div>
   );
 };
