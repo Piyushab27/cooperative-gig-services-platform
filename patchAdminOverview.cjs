@@ -1,9 +1,17 @@
-import React from 'react';
-import { useDemo } from '../../context/DemoContext';
-import { Users, ShieldCheck, Activity, TrendingUp, Heart, DollarSign, Filter, Calendar, Building2, Wrench, Download, FileText, CheckCircle2 } from 'lucide-react';
-import { useState } from 'react';
+const fs = require('fs');
 
-export const AdminOverview: React.FC = () => {
+let content = fs.readFileSync('src/components/admin/AdminOverview.tsx', 'utf8');
+
+// Imports
+content = content.replace(
+  "import { Users, ShieldCheck, Activity, TrendingUp, Heart, DollarSign } from 'lucide-react';",
+  "import { Users, ShieldCheck, Activity, TrendingUp, Heart, DollarSign, Filter, Calendar, Building2, Wrench, Download, FileText, CheckCircle2 } from 'lucide-react';\nimport { useState } from 'react';"
+);
+
+// Add states
+content = content.replace(
+  "export const AdminOverview: React.FC = () => {",
+  `export const AdminOverview: React.FC = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportType, setReportType] = useState('performance');
   const [reportGenerating, setReportGenerating] = useState(false);
@@ -21,11 +29,13 @@ export const AdminOverview: React.FC = () => {
       }, 2000);
     }, 1500);
   };
+`
+);
 
-  return (
-    <div className="space-y-6">
-      
-      {/* Header & Actions */}
+// Add Top Action Bar (Reports)
+const topMetricsRegex = /{\/\* Top Metrics Grid \*\/}/;
+content = content.replace(topMetricsRegex, 
+  `{/* Header & Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
         <div>
           <h3 className="font-extrabold text-lg text-slate-900">Federation Performance</h3>
@@ -40,46 +50,13 @@ export const AdminOverview: React.FC = () => {
         </button>
       </div>
 
-      {/* Top Metrics Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Total Workers</span>
-            <Users className="w-4 h-4 text-emerald-600" />
-          </div>
-          <span className="text-2xl font-extrabold text-slate-900">2,846</span>
-          <span className="text-[10px] text-emerald-600 font-semibold block mt-1">2,613 Verified Members</span>
-        </div>
+      {/* Top Metrics Grid */}`
+);
 
-        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Jobs Today</span>
-            <Activity className="w-4 h-4 text-blue-600" />
-          </div>
-          <span className="text-2xl font-extrabold text-slate-900">684</span>
-          <span className="text-[10px] text-slate-500 font-semibold block mt-1">12,482 Lifetime Jobs</span>
-        </div>
-
-        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Worker Earnings</span>
-            <TrendingUp className="w-4 h-4 text-emerald-600" />
-          </div>
-          <span className="text-2xl font-extrabold text-emerald-700">₹48.6L</span>
-          <span className="text-[10px] text-emerald-600 font-semibold block mt-1">Direct 85% Fair Wage</span>
-        </div>
-
-        <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-bold uppercase tracking-wider">Welfare Fund</span>
-            <Heart className="w-4 h-4 text-amber-500 fill-amber-500" />
-          </div>
-          <span className="text-2xl font-extrabold text-amber-600">₹3.2L</span>
-          <span className="text-[10px] text-amber-700 font-semibold block mt-1">Healthcare & Pensions</span>
-        </div>
-      </div>
-
-      {/* Advanced Analytics Filters */}
+// Add Filter Bar and Society Comparison Chart
+const chartsRegex = /{\/\* Analytics Chart Mockups \*\/}/;
+content = content.replace(chartsRegex,
+  `{/* Advanced Analytics Filters */}
       <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2 text-slate-500 mr-2">
           <Filter className="w-4 h-4" />
@@ -123,85 +100,13 @@ export const AdminOverview: React.FC = () => {
         </div>
       </div>
 
-      {/* Analytics Chart Mockups */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="font-extrabold text-sm text-slate-900">Weekly Job Volume Growth</h4>
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">+18.4% this week</span>
-          </div>
+      {/* Analytics Chart Mockups */}`
+);
 
-          {/* Bar Chart Visualization */}
-          <div className="h-48 flex items-end justify-between gap-3 pt-6 px-2">
-            {[
-              { day: 'Mon', count: 520, height: '55%' },
-              { day: 'Tue', count: 580, height: '62%' },
-              { day: 'Wed', count: 640, height: '70%' },
-              { day: 'Thu', count: 610, height: '66%' },
-              { day: 'Fri', count: 720, height: '80%' },
-              { day: 'Sat', count: 890, height: '95%' },
-              { day: 'Sun', count: 684, height: '75%' },
-            ].map(d => (
-              <div key={d.day} className="flex-1 flex flex-col items-center gap-2 group">
-                <span className="text-[10px] font-bold text-slate-400 opacity-0 group-hover:opacity-100 transition">{d.count}</span>
-                <div style={{ height: d.height }} className="w-full bg-emerald-500 hover:bg-emerald-400 rounded-t-xl transition-all shadow" />
-                <span className="text-[11px] font-bold text-slate-600">{d.day}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="font-extrabold text-sm text-slate-900">Worker Trade Utilization</h4>
-            <span className="text-xs font-bold text-slate-500">89% Avg Active</span>
-          </div>
-
-          <div className="space-y-3 pt-2 text-xs">
-            <div>
-              <div className="flex justify-between font-bold text-slate-700 mb-1">
-                <span>Electricians (412 workers)</span>
-                <span className="text-emerald-700">94% Active</span>
-              </div>
-              <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 w-[94%]" />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between font-bold text-slate-700 mb-1">
-                <span>AC Technicians (280 workers)</span>
-                <span className="text-emerald-700">98% Active</span>
-              </div>
-              <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-sky-500 w-[98%]" />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between font-bold text-slate-700 mb-1">
-                <span>Plumbers (350 workers)</span>
-                <span className="text-emerald-700">88% Active</span>
-              </div>
-              <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-500 w-[88%]" />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between font-bold text-slate-700 mb-1">
-                <span>Painters & Cleaners (520 workers)</span>
-                <span className="text-emerald-700">82% Active</span>
-              </div>
-              <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-purple-500 w-[82%]" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
+// Append Society Comparison Chart and Report Modal to the bottom
+content = content.replace(
+  "    </div>\n  );\n};",
+  `
       {/* Society Comparison Chart */}
       <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
@@ -231,7 +136,7 @@ export const AdminOverview: React.FC = () => {
                 </div>
               </div>
               <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden mt-2">
-                <div className={`h-full ${soc.color} ${soc.progress}`} />
+                <div className={\`h-full \${soc.color} \${soc.progress}\`} />
               </div>
             </div>
           ))}
@@ -295,4 +200,8 @@ export const AdminOverview: React.FC = () => {
 
     </div>
   );
-};
+};`
+);
+
+fs.writeFileSync('src/components/admin/AdminOverview.tsx', content);
+console.log('AdminOverview patched.');

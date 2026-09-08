@@ -3,6 +3,7 @@ import { AdminOverview } from './AdminOverview';
 import { WorkerVerificationTable } from './WorkerVerificationTable';
 import { AIDemandForecast } from './AIDemandForecast';
 import { WageRulesConfigurator } from './WageRulesConfigurator';
+import { SocietyManagement } from './SocietyManagement';
 import {
   LayoutDashboard,
   UserCheck,
@@ -13,7 +14,7 @@ import {
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'verification' | 'forecast' | 'wagerules'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'verification' | 'forecast' | 'wagerules' | 'societies'>('overview');
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -101,6 +102,7 @@ export const AdminDashboard: React.FC = () => {
       {activeTab === 'verification' && <WorkerVerificationTable />}
       {activeTab === 'forecast' && <AIDemandForecast />}
       {activeTab === 'wagerules' && <WageRulesConfigurator />}
+      {activeTab === 'societies' && <SocietyManagement />}
 
     </div>
   );
