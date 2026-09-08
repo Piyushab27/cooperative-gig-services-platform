@@ -1,17 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { VerifiedBadge } from '../common/VerifiedBadge';
-import { HardHat, ShieldCheck, Power, Award, Star } from 'lucide-react';
+import { Power, Star, AlertTriangle } from 'lucide-react';
 
 export const WorkerHeader: React.FC = () => {
-  const { workers, activeWorkerId } = useDemo();
+  const { workers, activeWorkerId, toggleAvailability } = useDemo();
   const worker = workers.find(w => w.id === activeWorkerId) || workers[0];
 
-  const [isOnline, setIsOnline] = React.useState(worker.isAvailable);
+  const [emergencyOn, setEmergencyOn] = useState(true);
 
   return (
     <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white p-6 rounded-3xl shadow-xl border border-slate-800">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         
         {/* Worker Info */}
         <div className="flex items-center gap-4">
@@ -23,15 +23,18 @@ export const WorkerHeader: React.FC = () => {
             />
             <span
               className={`w-4 h-4 rounded-full border-2 border-slate-900 absolute -bottom-1 -right-1 ${
-                isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-slate-500'
+                worker.isAvailable ? 'bg-emerald-500 animate-pulse' : 'bg-slate-500'
               }`}
             />
           </div>
 
           <div>
+            <div className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider mb-0.5">
+              Welcome Back
+            </div>
             <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-extrabold text-white">{worker.name}</h2>
-              <span className="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-2.5 py-0.5 rounded-full border border-emerald-400/40">
+              <h2 className="text-2xl font-extrabold text-white uppercase tracking-tight">{worker.name}</h2>
+              <span className="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-2.5 py-0.5 rounded-md border border-emerald-400/40">
                 {worker.categoryLabel}
               </span>
             </div>
@@ -48,24 +51,55 @@ export const WorkerHeader: React.FC = () => {
               <span>•</span>
               <span>{worker.jobsCompleted} Jobs Completed</span>
               <span>•</span>
-              <span className="text-emerald-400 font-bold">Welfare Active</span>
+              <span className="font-bold">Banjara Hills, Hyderabad</span>
             </div>
           </div>
         </div>
 
-        {/* Availability Toggle */}
-        <div className="flex items-center gap-3 self-end md:self-center">
-          <button
-            onClick={() => setIsOnline(!isOnline)}
-            className={`px-4 py-2.5 rounded-2xl font-extrabold text-xs transition-all flex items-center gap-2 shadow-lg ${
-              isOnline
-                ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-950'
-                : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
-            }`}
-          >
-            <Power className="w-4 h-4" />
-            <span>{isOnline ? '🟢 ONLINE — RECEIVING JOBS' : '🔴 OFFLINE'}</span>
-          </button>
+        {/* Availability Toggles */}
+        <div className="flex flex-col gap-3 self-end md:self-center bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col">
+              <span className="text-xs font-extrabold text-slate-200">WORK STATUS</span>
+              <span className="text-[10px] text-slate-400 font-medium">
+                {worker.isAvailable ? 'Available for new bookings' : 'Not accepting new bookings'}
+              </span>
+            </div>
+            <button
+              onClick={() => toggleAvailability(worker.id)}
+              className={`px-4 py-2 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center min-w-[80px] shadow-lg ${
+                worker.isAvailable
+                  ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-950'
+                  : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
+              }`}
+            >
+              {worker.isAvailable ? 'ON' : 'OFF'}
+            </button>
+          </div>
+
+          <div className="h-px bg-slate-700/50 w-full" />
+
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col">
+              <span className="text-xs font-extrabold text-rose-300 flex items-center gap-1">
+                <AlertTriangle className="w-3 h-3" />
+                EMERGENCY AVAILABILITY
+              </span>
+              <span className="text-[10px] text-slate-400 font-medium">
+                {emergencyOn ? 'Available for emergency dispatch' : 'Emergency dispatch OFF'}
+              </span>
+            </div>
+            <button
+              onClick={() => setEmergencyOn(!emergencyOn)}
+              className={`px-4 py-2 rounded-xl font-extrabold text-xs transition-all flex items-center justify-center min-w-[80px] shadow-lg ${
+                emergencyOn
+                  ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-950'
+                  : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
+              }`}
+            >
+              {emergencyOn ? 'ON' : 'OFF'}
+            </button>
+          </div>
         </div>
 
       </div>

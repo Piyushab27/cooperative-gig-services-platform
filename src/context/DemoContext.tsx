@@ -142,7 +142,8 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
 
 export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { role: authRole, requireAuth } = useAuth();
-  const role: Role = authRole || 'customer';
+  const [demoOverrideRole, setDemoOverrideRole] = useState<Role | null>(null);
+  const role: Role = demoOverrideRole || authRole || 'customer';
   
   const [language, setLanguage] = useState<Language>('en');
   const [location, setLocation] = useState<string>('Hyderabad (Banjara Hills)');
@@ -226,7 +227,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       problemDescription: details.problem,
       photoUrl: details.photoUrl,
       isEmergency: details.isEmergency || false,
-      status: 'accepted',
+      status: 'requested',
       estimatedPrice: price,
       wageBreakdown: breakdown,
       createdAt: new Date().toISOString(),
@@ -348,8 +349,12 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const triggerDemoJourney = (targetRole: Role) => {
-    console.log(`Demo Journey triggered for ${targetRole} - Action disabled due to Real Auth.`);
+    setDemoOverrideRole(targetRole);
+    window.scrollTo(0, 0);
   };
+  // const oldTriggerDemoJourney = (targetRole: Role) => {
+    // console.log(`Demo Journey triggered for ${targetRole} - Action disabled due to Real Auth.`);
+  // };
 
   return (
     <DemoContext.Provider

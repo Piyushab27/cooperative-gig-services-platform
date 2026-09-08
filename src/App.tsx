@@ -37,7 +37,7 @@ const MainApp: React.FC = () => {
         {demoRole === 'customer' && <CustomerView />}
         
         {/* Dashboards strictly require authenticated role */}
-        {authRole === 'worker' && user && <WorkerDashboard />}
+        {demoRole === 'worker' && <WorkerDashboard />}
         {authRole === 'admin' && user && <AdminDashboard />}
       </main>
 
