@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDemo } from '../../context/DemoContext';
 import { BookingStatus } from '../../types';
 import { VerifiedBadge } from '../common/VerifiedBadge';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { EmptyState } from '../common/EmptyState';
 import { DisputeModal } from './DisputeModal';
+import { createSupabaseComplaint } from '../../services/supabaseService';
+import { supabase } from '../../lib/supabase';
 import {
   Calendar,
   Clock,
@@ -30,10 +32,23 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
 }) => {
   const { bookings, location, isLoading } = useDemo();
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [complaints, setComplaints] = useState<any[]>([]);
+  const [isLoadingComplaints, setIsLoadingComplaints] = useState(false);
   const [newDispute, setNewDispute] = useState<any>(null);
   const [disputeSuccessMessage, setDisputeSuccessMessage] = useState("");
   const [activeTab, setActiveTab] = useState<'bookings' | 'addresses' | 'payments' | 'invoices'>('bookings');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('all');
+
+  
+  useEffect(() => {
+    if (activeTab === ('disputes' as any)) {
+      setIsLoadingComplaints(true);
+      supabase.from('complaints').select('*').eq('customer_id', 'c-1').then(({ data }) => {
+        if (data) setComplaints(data);
+        setIsLoadingComplaints(false);
+      });
+    }
+  }, [activeTab]);
 
   const filteredBookings = bookings.filter(b => {
     if (statusFilter === 'active') return b.status !== 'completed' && b.status !== 'cancelled';
@@ -321,39 +336,31 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
               </div>
             )}
 
-            {newDispute && (
-              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 animate-in fade-in">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold text-sm text-slate-900">{newDispute.category} ({newDispute.bookingId})</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 uppercase">
-                    {newDispute.status}
-                  </span>
+            {isLoadingComplaints ? (
+              <div className="py-8 text-center text-slate-500 font-bold text-sm">Loading disputes...</div>
+            ) : complaints.length === 0 ? (
+              <EmptyState title="No Disputes" description="You have no active disputes or complaints." icon={ShieldCheck} />
+            ) : (
+              complaints.map(c => (
+                <div key={c.id} className="p-4 rounded-2xl bg-rose-50 border border-rose-200 animate-in fade-in">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-sm text-slate-900">{c.category} ({c.booking_id})</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 uppercase">
+                      {c.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 mb-3">{c.description}</p>
+                  <div className="flex items-center justify-between text-[10px] font-semibold text-slate-500">
+                    <div className="flex items-center gap-2">
+                      <span>Raised: {new Date(c.created_at).toLocaleDateString()}</span>
+                      <span>•</span>
+                      <span>Assigned to: Cooperative Grievance Team</span>
+                    </div>
+                    {c.amount > 0 && <span className="font-bold text-rose-700">₹{c.amount}</span>}
+                  </div>
                 </div>
-                <p className="text-xs text-slate-600 mb-3">{newDispute.description}</p>
-                <div className="flex items-center gap-2 text-[10px] font-semibold text-slate-500">
-                  <span>Raised: {newDispute.date}</span>
-                  <span>•</span>
-                  <span>Assigned to: Cooperative Grievance Team</span>
-                </div>
-              </div>
+              ))
             )}
-
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-bold text-sm text-slate-900">Overcharging Complaint (BK-2026-8812)</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 uppercase">
-                  Under Review
-                </span>
-              </div>
-              <p className="text-xs text-slate-600 mb-3">
-                Worker asked for ₹200 extra beyond the agreed estimated price for materials not used.
-              </p>
-              <div className="flex items-center gap-2 text-[10px] font-semibold text-slate-500">
-                <span>Raised: 2 days ago</span>
-                <span>•</span>
-                <span>Assigned to: Hyderabad Federation Grievance Cell</span>
-              </div>
-            </div>
           </div>
         </div>
       )}
@@ -361,11 +368,24 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
       <DisputeModal
         isOpen={isDisputeModalOpen}
         onClose={() => setIsDisputeModalOpen(false)}
-        onSubmit={(dispute: any) => {
-          setNewDispute(dispute);
+        onSubmit={async (dispute: any) => {
           setIsDisputeModalOpen(false);
-          setDisputeSuccessMessage("Your dispute has been registered and will be reviewed by the cooperative grievance team.");
-          setTimeout(() => setDisputeSuccessMessage(""), 5000);
+          try {
+            const booking = bookings.find(b => b.id === dispute.bookingId);
+            const workerId = booking?.workerId || 'w-1';
+            await createSupabaseComplaint(dispute.bookingId, 'c-1', workerId, dispute.category, dispute.description, dispute.amount || 0); // Note: Should ideally pass correct workerId from booking.
+            setDisputeSuccessMessage("Your dispute has been registered and will be reviewed by the cooperative grievance team.");
+            
+            // Reload complaints
+            supabase.from('complaints').select('*').eq('customer_id', 'c-1').then(({ data }) => {
+              if (data) setComplaints(data);
+            });
+            
+            setTimeout(() => setDisputeSuccessMessage(""), 5000);
+          } catch (e) {
+            console.error("Failed to submit dispute", e);
+            alert("Failed to submit dispute. Please try again.");
+          }
         }}
       />
     </div>

@@ -14,6 +14,7 @@ import { MOCK_WORKERS } from '../data/mockWorkers';
 import { INITIAL_BOOKINGS } from '../data/mockBookings';
 import { TRANSLATIONS } from '../data/translations';
 import { calculateFairWage } from '../utils/fairWage';
+import { getSupabaseWorkers, getSupabaseBookings, createSupabaseComplaint, updateSupabaseBookingStatus, createEmergencyRequest } from '../services/supabaseService';
 
 interface WageConfig {
   workerPct: number;
@@ -141,6 +142,29 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
 ];
 
 export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const supabaseWorkers = await getSupabaseWorkers();
+        const supabaseBookings = await getSupabaseBookings();
+        
+        if (supabaseWorkers.length > 0) {
+          setWorkers(supabaseWorkers);
+        }
+        if (supabaseBookings.length > 0) {
+          setBookings(supabaseBookings);
+        }
+      } catch (err) {
+        console.error("Failed to load Supabase data:", err);
+      } finally {
+        setIsDataLoaded(true);
+      }
+    };
+    loadData();
+  }, []);
+
   const { role: authRole, requireAuth } = useAuth();
   const [demoOverrideRole, setDemoOverrideRole] = useState<Role | null>(null);
   const role: Role = demoOverrideRole || authRole || 'customer';

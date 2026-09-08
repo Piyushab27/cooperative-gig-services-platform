@@ -37,7 +37,17 @@ const CATEGORIES: CategoryDef[] = [
   { id: 'gardener', label: 'Gardener', sublabel: 'Terrace & Lawn Care', icon: Trees, colorBg: 'bg-green-100', colorText: 'text-green-700' },
 ];
 
+import { useEffect, useState } from 'react';
+import { getSupabaseServices } from '../../services/supabaseService';
+
 export const ServiceCategories: React.FC = () => {
+  const [activeServices, setActiveServices] = useState<any[]>([]);
+
+  useEffect(() => {
+    getSupabaseServices().then(res => {
+      setActiveServices(res);
+    });
+  }, []);
   const { 
     selectedCategory, setSelectedCategory,
     selectedCategories, setSelectedCategories,

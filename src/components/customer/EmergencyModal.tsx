@@ -4,6 +4,7 @@ import { Worker } from '../../types';
 import { InteractiveMap } from '../common/InteractiveMap';
 import { VerifiedBadge } from '../common/VerifiedBadge';
 import { AlertTriangle, X, Zap, Wrench, Snowflake, Lock, Settings, Navigation, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { createEmergencyRequest } from '../../services/supabaseService';
 
 interface EmergencyModalProps {
   isOpen: boolean;

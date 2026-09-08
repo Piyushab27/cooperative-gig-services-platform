@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useDemo } from '../../context/DemoContext';
+import { getSupabaseInvoice } from '../../services/supabaseService';
+import { useEffect } from 'react';
 import { FairWageCard } from '../common/FairWageCard';
 import { VerifiedBadge } from '../common/VerifiedBadge';
 import { X, FileText, CheckCircle2, ShieldCheck, Heart, ArrowRight } from 'lucide-react';
@@ -19,13 +21,20 @@ export const TransparentBillModal: React.FC<TransparentBillModalProps> = ({
 }) => {
   const { bookings } = useDemo();
   const booking = bookings.find(b => b.id === bookingId) || bookings[0];
+  const [invoice, setInvoice] = useState<any>(null);
+
+  useEffect(() => {
+    if (isOpen && booking) {
+      getSupabaseInvoice(booking.id).then(res => setInvoice(res));
+    }
+  }, [isOpen, booking?.id]);
 
   if (!isOpen || !booking) return null;
 
-  const baseFare = 350;
-  const materialsCost = 100;
-  const travelCost = 50;
-  const totalAmount = booking.finalPrice || baseFare + materialsCost + travelCost;
+  const baseFare = invoice?.service_fee || booking.estimatedPrice || 350;
+  const materialsCost = invoice?.materials_fee || 0;
+  const travelCost = invoice?.travel_fee || 0;
+  const totalAmount = invoice?.total || booking.finalPrice || baseFare + materialsCost + travelCost;
 
   const handleDownload = () => {
     const workerEarnings = Math.round(totalAmount * 0.85);
@@ -165,6 +174,15 @@ Worker Welfare & Insurance Fund (5%): ₹${welfareFund}
           </div>
 
           <div className="flex gap-2 w-full sm:w-auto">
+            {(booking.status !== 'completed' && invoice?.status !== 'paid') && (
+              <button
+                onClick={() => onProceedToPayment(totalAmount)}
+                className="flex-1 sm:flex-none px-4 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm transition shadow-sm flex items-center justify-center gap-2"
+              >
+                <span>Proceed to Payment</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
             <button
               onClick={onClose}
               className="flex-1 sm:flex-none px-4 py-3 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-extrabold text-sm transition shadow-sm flex items-center justify-center gap-2"

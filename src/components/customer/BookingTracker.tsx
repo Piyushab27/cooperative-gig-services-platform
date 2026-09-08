@@ -81,9 +81,8 @@ export const BookingTracker: React.FC<BookingTrackerProps> = ({
             <button
               onClick={handleAdvanceStatus}
               className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-emerald-400 font-bold text-xs border border-slate-700 flex items-center gap-1.5 transition"
-              title="Simulate status progression for demo"
-            >
-              <span>Next Step →</span>
+              >
+              <span>Next Step</span>
             </button>
           )}
         </div>
